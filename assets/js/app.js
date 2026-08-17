@@ -526,8 +526,10 @@ if (sortedRecords.length) {
   const latestWorkout = latest.workouts?.length ? `${latest.workouts.length}종목` : "—";
   const totalSets = latest.workouts?.reduce((sum, workout) => sum + (workout.sets ?? 0), 0) ?? 0;
   const latestWeight = Number(latest.body?.weight);
-  const proteinTarget = Number.isFinite(latestWeight)
-    ? `약 ${Math.round(latestWeight * policy.nutrition.proteinTargetPerKg)}g`
+  const recentMeasuredWeight = Number(recordsWithBody[0]?.body?.weight);
+  const proteinReferenceWeight = Number.isFinite(latestWeight) ? latestWeight : recentMeasuredWeight;
+  const proteinTarget = Number.isFinite(proteinReferenceWeight)
+    ? `약 ${Math.round(proteinReferenceWeight * policy.nutrition.proteinTargetPerKg)}g${Number.isFinite(latestWeight) ? "" : " (최근 체중 기준)"}`
     : "체중 기록 필요";
 
   document.getElementById("latest-date").textContent = formatDate(latest.date);
@@ -545,7 +547,7 @@ if (sortedRecords.length) {
     <div class="metric"><span>추정 단백질</span><strong>${latest.nutritionEstimate ? `${escapeHtml(latest.nutritionEstimate.protein)} / 목표 ${escapeHtml(proteinTarget)}` : "—"}</strong></div>
   `;
 
-  renderCompositionAnalysis(latest);
+  renderCompositionAnalysis(recordsWithBody[0]);
 
   if (latest.advice) {
     const feedbackContent = latest.advice.points?.length
