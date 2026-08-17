@@ -2,9 +2,10 @@ const { birthYear, heightCm, defaultReps } = window.fitnessProfile;
 const compositionStandards = window.bodyCompositionStandards;
 const policy = window.coachingPolicy;
 const muscleMap = window.muscleMapConfig;
+const nutritionReference = policy.nutrition.adultReference;
 const freeSugarPolicy = policy.nutrition.freeSugar;
-const freeSugarReferenceMax = Math.round(freeSugarPolicy.referenceCalories * freeSugarPolicy.maximumEnergyRatio / freeSugarPolicy.caloriesPerGram);
-const freeSugarReferenceIdeal = Math.round(freeSugarPolicy.referenceCalories * freeSugarPolicy.idealEnergyRatio / freeSugarPolicy.caloriesPerGram);
+const freeSugarReferenceMax = Math.round(nutritionReference.energyKcal * freeSugarPolicy.maximumEnergyRatio / freeSugarPolicy.caloriesPerGram);
+const freeSugarReferenceIdeal = Math.round(nutritionReference.energyKcal * freeSugarPolicy.idealEnergyRatio / freeSugarPolicy.caloriesPerGram);
 const exercisesById = new Map(window.exerciseCatalog.map((exercise) => [exercise.id, exercise]));
 const healthRecords = window.healthRecordData.map((record) => ({
   ...record,
@@ -269,7 +270,7 @@ const renderNutritionEstimate = (estimate) => estimate ? `
     </div>
     <small><strong>가정:</strong> ${escapeHtml(estimate.assumptions)}</small>
     <small><strong>판단 기준:</strong> ${escapeHtml(estimate.target)}</small>
-    ${estimate.freeSugar ? `<small><strong>유리당 기준:</strong> WHO 권고는 하루 에너지의 10% 미만, 가능하면 5% 미만이다. ${freeSugarPolicy.referenceCalories.toLocaleString("ko-KR")}kcal 기준 각각 ${freeSugarReferenceMax}g·${freeSugarReferenceIdeal}g 미만이다.</small>` : ""}
+    ${estimate.freeSugar ? `<small><strong>유리당 기준:</strong> WHO 권고는 하루 에너지의 10% 미만, 가능하면 5% 미만이다. ${nutritionReference.energyKcal.toLocaleString("ko-KR")}kcal 참고치에 적용하면 각각 약 ${freeSugarReferenceMax}g·${freeSugarReferenceIdeal}g 미만이다.</small>` : ""}
     ${estimate.freeSugar ? `<div class="estimate-sources">${renderSourceLinks(freeSugarPolicy.sources)}</div>` : ""}
     ${estimate.sources?.length ? `<div class="estimate-sources">${estimate.sources.map((source) => `<a href="${escapeHtml(source.href)}" target="_blank" rel="noopener noreferrer">${escapeHtml(source.label)}</a>`).join("")}</div>` : ""}
   </div>
@@ -279,6 +280,103 @@ const sortedRecords = [...healthRecords].sort((a, b) => b.date.localeCompare(a.d
 const recordsWithBody = sortedRecords.filter((record) => record.body && Object.values(record.body).some((value) => value !== null && value !== undefined && value !== ""));
 const recordsWithWorkout = sortedRecords.filter((record) => record.workouts?.length);
 const recordsWithMeals = sortedRecords.filter((record) => record.meals?.length);
+
+const formatNutritionNumber = (value) => Number(value).toLocaleString("ko-KR", {
+  maximumFractionDigits: Number.isInteger(value) ? 0 : 1
+});
+
+const buildNutrientDefinitions = (weight) => {
+  const energy = nutritionReference.energyKcal;
+  const proteinTarget = Math.round(weight * policy.nutrition.proteinTargetPerKg);
+  const carbohydrateMin = Math.round(energy * nutritionReference.carbohydrateEnergyRatio.min / 4);
+  const carbohydrateMax = Math.round(energy * nutritionReference.carbohydrateEnergyRatio.max / 4);
+  const fatMin = Math.round(energy * nutritionReference.totalFatEnergyRatio.min / 9);
+  const fatMax = Math.round(energy * nutritionReference.totalFatEnergyRatio.max / 9);
+  const saturatedFatMax = energy * nutritionReference.saturatedFatEnergyRatioMax / 9;
+
+  return {
+    energy: { label: "에너지", type: "range", targetMin: energy * 0.9, targetMax: energy * 1.1, targetLabel: `참고 ${energy.toLocaleString("ko-KR")}kcal`, percentBasis: energy, percentLabel: "참고치" },
+    protein: { label: "단백질", type: "minimum", targetMin: proteinTarget, targetLabel: `개인 목표 ${proteinTarget}g`, percentBasis: proteinTarget, percentLabel: "개인 목표" },
+    carbohydrate: { label: "탄수화물", type: "range", targetMin: carbohydrateMin, targetMax: carbohydrateMax, targetLabel: `권고 ${carbohydrateMin}~${carbohydrateMax}g`, percentBasis: carbohydrateMin, percentLabel: "권고 하한" },
+    totalFat: { label: "지방", type: "range", targetMin: fatMin, targetMax: fatMax, targetLabel: `권고 ${fatMin}~${fatMax}g`, percentBasis: fatMax, percentLabel: "권고 상한" },
+    saturatedFat: { label: "포화지방", type: "maximum", targetMax: saturatedFatMax, targetLabel: `상한 약 ${Math.round(saturatedFatMax)}g 미만`, percentBasis: saturatedFatMax, percentLabel: "상한" },
+    freeSugar: { label: "유리당", type: "maximum", targetMax: freeSugarReferenceMax, targetLabel: `상한 ${freeSugarReferenceMax}g · 이상적 ${freeSugarReferenceIdeal}g 미만`, percentBasis: freeSugarReferenceMax, percentLabel: "상한" },
+    fiber: { label: "식이섬유", type: "minimum", targetMin: nutritionReference.fiberMinGrams, targetLabel: `목표 ${nutritionReference.fiberMinGrams}g 이상`, percentBasis: nutritionReference.fiberMinGrams, percentLabel: "목표" },
+    sodium: { label: "나트륨", type: "maximum", targetMax: nutritionReference.sodiumMaxMg, targetLabel: `상한 ${nutritionReference.sodiumMaxMg.toLocaleString("ko-KR")}mg 미만`, percentBasis: nutritionReference.sodiumMaxMg, percentLabel: "상한" }
+  };
+};
+
+const nutrientStatus = (intake, definition) => {
+  if (definition.type === "minimum") {
+    if (intake.max < definition.targetMin) return { key: "low", label: "부족 추정" };
+    if (intake.min >= definition.targetMin) return { key: "ok", label: "목표 충족" };
+    return { key: "mixed", label: "충족 가능" };
+  }
+  if (definition.type === "maximum") {
+    if (intake.min > definition.targetMax) return { key: "high", label: "상한 초과" };
+    if (intake.max <= definition.targetMax) return { key: "ok", label: "상한 이내" };
+    return { key: "high", label: "초과 가능" };
+  }
+  if (intake.max < definition.targetMin) return { key: "low", label: "권고 미달" };
+  if (intake.min > definition.targetMax) return { key: "high", label: "권고 초과" };
+  if (intake.min >= definition.targetMin && intake.max <= definition.targetMax) return { key: "ok", label: "권고 범위" };
+  return { key: "mixed", label: "권고와 겹침" };
+};
+
+const renderNutrientCard = (key, intake, definition) => {
+  const status = nutrientStatus(intake, definition);
+  const targetAnchor = definition.targetMax ?? definition.targetMin;
+  const scaleMax = Math.max(intake.max * 1.08, targetAnchor * 1.35, definition.targetMin ?? 0);
+  const targetStart = definition.type === "maximum" ? 0 : definition.targetMin;
+  const targetEnd = definition.type === "minimum" ? scaleMax : definition.targetMax;
+  const percent = (value) => Math.round(value / definition.percentBasis * 100);
+  const position = (value) => Math.max(0, Math.min(100, value / scaleMax * 100));
+  const intakeLeft = position(intake.min);
+  const intakeRight = position(intake.max);
+
+  return `
+    <article class="nutrient-card" data-status="${status.key}" data-nutrient="${escapeHtml(key)}">
+      <div class="nutrient-card-head">
+        <h3>${escapeHtml(definition.label)}</h3>
+        <span class="nutrient-status">${escapeHtml(status.label)}</span>
+      </div>
+      <div class="nutrient-values">
+        <strong>${formatNutritionNumber(intake.min)}~${formatNutritionNumber(intake.max)}${escapeHtml(intake.unit)}</strong>
+        <span>${escapeHtml(definition.targetLabel)}</span>
+      </div>
+      <div class="nutrient-track" aria-label="${escapeHtml(definition.label)} 추정 섭취 범위와 목표 비교">
+        <span class="nutrient-target-band" style="left:${position(targetStart)}%;width:${Math.max(0, position(targetEnd) - position(targetStart))}%"></span>
+        <span class="nutrient-intake-range" style="left:${intakeLeft}%;width:${Math.max(2, intakeRight - intakeLeft)}%"></span>
+      </div>
+      <small class="nutrient-percent">${escapeHtml(definition.percentLabel)}의 ${percent(intake.min)}~${percent(intake.max)}%</small>
+    </article>
+  `;
+};
+
+const renderNutrientBalance = (record) => {
+  const grid = document.getElementById("nutrient-balance-grid");
+  if (!grid || !record?.nutritionEstimate?.nutrients) return;
+  const referenceWeight = Number(record.body?.weight) || Number(recordsWithBody.find((item) => Number(item.body?.weight))?.body.weight);
+  if (!referenceWeight) return;
+  const definitions = buildNutrientDefinitions(referenceWeight);
+  const nutrients = record.nutritionEstimate.nutrients;
+  const cards = Object.entries(definitions)
+    .filter(([key]) => nutrients[key])
+    .map(([key, definition]) => renderNutrientCard(key, nutrients[key], definition));
+  const balancePoint = record.advice?.points?.find((point) => point.label === "영양 균형");
+  const sugarPoint = record.advice?.points?.find((point) => point.label === "유리당");
+  const referenceSources = [...nutritionReference.sources, ...freeSugarPolicy.sources];
+
+  document.getElementById("nutrient-balance-date").textContent = formatDate(record.date);
+  grid.innerHTML = cards.join("");
+  document.getElementById("nutrient-balance-feedback").innerHTML = `
+    <strong class="feedback-title">오늘의 피드백</strong>
+    ${escapeHtml(balancePoint?.text ?? "영양소별 추정 범위를 다음 기록과 비교합니다.")}
+    ${sugarPoint ? `<span class="nutrition-focus-point">${escapeHtml(sugarPoint.text)}</span>` : ""}
+  `;
+  document.getElementById("nutrition-reference-note").textContent = `${nutritionReference.label}의 ${nutritionReference.energyKcal.toLocaleString("ko-KR")}kcal는 같은 연령대 남성의 집단 참고치이며 개인 처방값이 아니다. 실제 필요량은 활동량과 목표에 따라 달라진다. 파란 막대는 음식량이 불명확해 생기는 추정 범위다.`;
+  document.getElementById("nutrition-reference-links").innerHTML = renderSourceLinks(referenceSources);
+};
 
 const latestMealRecord = recordsWithMeals[0];
 if (latestMealRecord) {
@@ -298,6 +396,7 @@ if (latestMealRecord) {
     ${estimate?.target ? `<span class="muted">${escapeHtml(estimate.target)}</span>` : ""}
     ${estimate?.freeSugar ? `<div class="evidence-links">${renderSourceLinks(freeSugarPolicy.sources)}</div>` : ""}
   `;
+  renderNutrientBalance(latestMealRecord);
 }
 
 const recentMuscleRecords = recordsWithWorkout.slice(0, policy.recentWorkoutCount);

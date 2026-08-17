@@ -23,10 +23,23 @@ window.coachingPolicy = Object.freeze({
   },
   nutrition: {
     proteinTargetPerKg: 1.6,
+    adultReference: {
+      label: "2025 한국인 영양소 섭취기준 · 남성 30~49세",
+      energyKcal: 2500,
+      carbohydrateEnergyRatio: { min: 0.5, max: 0.65 },
+      totalFatEnergyRatio: { min: 0.15, max: 0.3 },
+      saturatedFatEnergyRatioMax: 0.1,
+      fiberMinGrams: 30,
+      sodiumMaxMg: 2000,
+      sources: [
+        { label: "2025 한국인 영양소 섭취기준", href: "https://www.kns.or.kr/fileroom/FileRoom_view.asp?BoardID=Kdr&idx=167" },
+        { label: "WHO 건강한 식사 기준", href: "https://www.who.int/news-room/fact-sheets/detail/healthy-diet" },
+        { label: "WHO 지방·탄수화물 지침", href: "https://www.who.int/news/item/17-07-2023-who-updates-guidelines-on-fats-and-carbohydrates" }
+      ]
+    },
     freeSugar: {
       maximumEnergyRatio: 0.1,
       idealEnergyRatio: 0.05,
-      referenceCalories: 2000,
       caloriesPerGram: 4,
       sources: [
         { label: "WHO 성인·어린이 유리당 섭취 지침", href: "https://www.who.int/publications/i/item/WHO-NMH-NHD-15.3" }

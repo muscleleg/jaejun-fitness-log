@@ -845,6 +845,104 @@
     .nutrition-focus .nutrition-focus-point { display: block; margin-top: 8px; }
     .nutrition-focus .muted { display: block; margin-top: 8px; }
 
+    .nutrient-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .nutrient-card {
+      min-width: 0;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--paper);
+    }
+
+    .nutrient-card-head,
+    .nutrient-values {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .nutrient-card h3 { margin: 0; font-size: 1rem; }
+
+    .nutrient-status {
+      flex: 0 0 auto;
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: var(--blue-soft);
+      color: var(--blue);
+      font-size: 0.72rem;
+      font-weight: 850;
+    }
+
+    .nutrient-card[data-status="low"] .nutrient-status,
+    .nutrient-card[data-status="high"] .nutrient-status {
+      background: #fff0e8;
+      color: #b84d20;
+    }
+
+    .nutrient-card[data-status="ok"] .nutrient-status {
+      background: var(--green-soft);
+      color: var(--green);
+    }
+
+    .nutrient-values { margin-top: 14px; align-items: end; }
+    .nutrient-values strong { font-size: 1.1rem; overflow-wrap: anywhere; }
+    .nutrient-values span { color: var(--muted); font-size: 0.78rem; text-align: right; }
+
+    .nutrient-track {
+      position: relative;
+      height: 11px;
+      margin-top: 13px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #e8edef;
+    }
+
+    .nutrient-target-band,
+    .nutrient-intake-range {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      border-radius: inherit;
+    }
+
+    .nutrient-target-band { background: #b9dcc9; }
+    .nutrient-intake-range { top: 2px; bottom: 2px; background: var(--blue); opacity: 0.88; }
+
+    .nutrient-percent {
+      display: block;
+      margin-top: 9px;
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
+    .nutrient-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 18px;
+      margin: 14px 0 0;
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+
+    .nutrient-legend span::before {
+      content: "";
+      display: inline-block;
+      width: 18px;
+      height: 7px;
+      margin-right: 6px;
+      border-radius: 999px;
+      background: #b9dcc9;
+      vertical-align: 1px;
+    }
+
+    .nutrient-legend .intake::before { background: var(--blue); }
+
     .data-link { color: var(--blue); font-weight: 800; }
 
     .empty {
@@ -1137,7 +1235,7 @@
       }
       .app-tab { padding: 11px 6px; font-size: 0.84rem; }
       section { margin-top: 42px; }
-      .stats, .grid, .coach-grid, .session-summary, .muscle-map-card, .routine-grid, .composition-grid { grid-template-columns: 1fr; }
+      .stats, .grid, .coach-grid, .session-summary, .muscle-map-card, .routine-grid, .composition-grid, .nutrient-grid { grid-template-columns: 1fr; }
       .metrics { grid-template-columns: repeat(2, 1fr); }
       .metric, .stat, .card, .feedback-card, .action-card, .composition-card, .muscle-map-info, .exercise-map-guide { min-width: 0; }
       .metric strong, .exercise-filter strong, .exercise-filter small, .composition-detail, .record, .archive-content { overflow-wrap: anywhere; }
@@ -1505,6 +1603,26 @@
       <div class="callout nutrition-focus" id="nutrition-focus">식사 기록이 들어오면 목표 대비 가장 중요한 보완점을 표시합니다.</div>
     </section>
 
+    <section data-dashboard-panel="nutrition" data-dashboard-order="2" aria-labelledby="nutrient-balance-title">
+      <div class="section-head">
+        <div>
+          <h2 id="nutrient-balance-title">하루 영양 충족도</h2>
+          <p class="muted">추정 섭취 범위가 성인 참고치와 개인 단백질 목표를 얼마나 채우거나 넘었는지 본다.</p>
+        </div>
+        <span class="tag blue" id="nutrient-balance-date">기록 대기 중</span>
+      </div>
+      <div class="nutrient-grid" id="nutrient-balance-grid">
+        <div class="empty">상세 영양 추정치가 들어오면 충족도를 표시합니다.</div>
+      </div>
+      <p class="nutrient-legend"><span>권고·목표 범위</span><span class="intake">추정 섭취 범위</span></p>
+      <div class="callout nutrition-focus" id="nutrient-balance-feedback">기록이 들어오면 부족·초과 가능성과 다음 행동을 표시합니다.</div>
+      <details class="source-disclosure">
+        <summary>기준과 해석 주의</summary>
+        <p class="composition-note" id="nutrition-reference-note"></p>
+        <div class="evidence-links" id="nutrition-reference-links"></div>
+      </details>
+    </section>
+
     <section data-dashboard-panel="workout" data-dashboard-order="4" aria-labelledby="workout-archive-title">
       <div class="section-head">
         <div>
@@ -1517,7 +1635,7 @@
       </div>
     </section>
 
-    <section data-dashboard-panel="nutrition" data-dashboard-order="2" aria-labelledby="nutrition-archive-title">
+    <section data-dashboard-panel="nutrition" data-dashboard-order="3" aria-labelledby="nutrition-archive-title">
       <div class="section-head">
         <div>
           <h2 id="nutrition-archive-title">날짜별 식사 기록</h2>
