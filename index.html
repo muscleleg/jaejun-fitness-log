@@ -465,6 +465,54 @@
       font-size: 0.9rem;
     }
 
+    .exercise-filter-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 9px;
+      margin-top: 14px;
+    }
+
+    .exercise-filter {
+      padding: 13px 14px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #f7faf9;
+      color: var(--ink);
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .exercise-filter:hover,
+    .exercise-filter:focus-visible {
+      border-color: #8cc7a8;
+      outline: 3px solid rgba(24, 121, 78, 0.10);
+    }
+
+    .exercise-filter[aria-pressed="true"] {
+      border-color: var(--green);
+      background: var(--green-soft);
+    }
+
+    .exercise-filter strong { display: block; line-height: 1.35; }
+
+    .exercise-filter small {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .exercise-history-panel {
+      margin-top: 22px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+    }
+
+    .exercise-history-panel[hidden] { display: none; }
+
+    .exercise-history-panel h3 { margin: 0 0 4px; }
+
     .workout-table-wrap {
       margin-top: 14px;
       overflow-x: auto;
@@ -497,22 +545,6 @@
     }
 
     .workout-history-table tbody tr:last-child td { border-bottom: 0; }
-
-    .workout-history-row {
-      cursor: pointer;
-      transition: background 0.15s ease;
-    }
-
-    .workout-history-row:hover,
-    .workout-history-row:focus-visible {
-      background: #f1f8f5;
-      outline: 3px solid rgba(24, 121, 78, 0.10);
-      outline-offset: -3px;
-    }
-
-    .workout-history-row[aria-selected="true"] {
-      background: var(--green-soft);
-    }
 
     .workout-history-table .date-cell { white-space: nowrap; font-weight: 800; }
     .workout-history-table .exercise-cell { min-width: 190px; font-weight: 850; }
@@ -997,6 +1029,7 @@
       .calendar-day { min-height: 54px; padding: 7px; font-size: 0.85rem; }
       .calendar-day.workout::after { content: ""; width: 7px; height: 7px; padding: 0; }
       .hero-goal { align-items: flex-start; flex-direction: column; }
+      .exercise-filter-list { grid-template-columns: 1fr; }
       .muscle-date-filter { flex: 1 1 140px; }
       .selected-workout-summary { align-items: start; flex-direction: column; gap: 4px; }
     }
@@ -1135,24 +1168,29 @@
           <div class="selected-workout-summary">
             <div>
               <h3 id="selected-workout-title">운동별 자극 연결</h3>
-              <p class="muted" id="selected-workout-description">표의 운동 행을 선택하면 해당 운동의 주동근과 보조근만 지도에 표시한다.</p>
+              <p class="muted" id="selected-workout-description">운동 박스를 선택하면 해당 종목의 날짜별 수행 이력이 아래에 펼쳐진다.</p>
             </div>
             <strong id="selected-workout-volume"></strong>
           </div>
-          <div class="workout-table-wrap">
-            <table class="workout-history-table">
-              <thead>
-                <tr>
-                  <th scope="col">날짜</th>
-                  <th scope="col">운동</th>
-                  <th scope="col">중량·수행 기록</th>
-                  <th scope="col">세트</th>
-                  <th scope="col">횟수</th>
-                  <th scope="col">자극 부위</th>
-                </tr>
-              </thead>
-              <tbody id="workout-history-table-body"></tbody>
-            </table>
+          <div class="exercise-filter-list" id="exercise-filter-list"></div>
+          <div class="exercise-history-panel" id="exercise-history-panel" hidden>
+            <h3 id="exercise-history-title"></h3>
+            <p class="muted" id="exercise-history-description"></p>
+            <div class="workout-table-wrap">
+              <table class="workout-history-table">
+                <thead>
+                  <tr>
+                    <th scope="col">날짜</th>
+                    <th scope="col">운동</th>
+                    <th scope="col">중량·수행 기록</th>
+                    <th scope="col">세트</th>
+                    <th scope="col">횟수</th>
+                    <th scope="col">난이도·자세</th>
+                  </tr>
+                </thead>
+                <tbody id="workout-history-table-body"></tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
@@ -1608,36 +1646,75 @@
       const overallScores = buildMuscleScores(recentWorkouts);
       const totalSets = (workouts) => workouts.reduce((sum, workout) => sum + (workout.sets ?? 0), 0);
 
-      const renderWorkoutTable = (entries, scopeLabel, scores) => {
-        const workouts = entries.map((entry) => entry.workout);
-        const tableBody = document.getElementById("workout-history-table-body");
-        document.getElementById("selected-workout-title").textContent = `${scopeLabel} 운동 기록`;
-        document.getElementById("selected-workout-description").textContent = "날짜별 수행 기록이 행으로 누적된다. 행을 선택하면 해당 운동의 자극 부위만 지도에 표시한다.";
-        document.getElementById("selected-workout-volume").textContent = `${workouts.length}종목 · ${totalSets(workouts)}세트`;
+      const uniqueExerciseEntries = (entries) => {
+        const seen = new Set();
+        return entries.filter(({ workout }) => {
+          if (seen.has(workout.name)) return false;
+          seen.add(workout.name);
+          return true;
+        });
+      };
 
-        tableBody.innerHTML = entries.map(({ date, workout }, index) => `
-          <tr class="workout-history-row" data-exercise-index="${index}" tabindex="0" role="button" aria-selected="false" aria-label="${escapeHtml(formatDate(date))} ${escapeHtml(workout.name)} 자극 보기">
+      const renderExerciseHistory = (exerciseName) => {
+        const historyEntries = recordsWithWorkout.flatMap((record) =>
+          record.workouts
+            .filter((workout) => workout.name === exerciseName)
+            .map((workout) => ({ date: record.date, workout }))
+        );
+        const panel = document.getElementById("exercise-history-panel");
+        const tableBody = document.getElementById("workout-history-table-body");
+        document.getElementById("exercise-history-title").textContent = `${exerciseName} 수행 이력`;
+        document.getElementById("exercise-history-description").textContent = `${historyEntries.length}회 기록 · 과거부터 같은 종목의 중량과 수행 품질 변화를 비교한다.`;
+        tableBody.innerHTML = historyEntries.map(({ date, workout }) => `
+          <tr>
             <td class="date-cell">${escapeHtml(formatDate(date))}</td>
             <td class="exercise-cell">${escapeHtml(workout.name)}</td>
             <td class="detail-cell">${escapeHtml(workout.detail || "상세 중량 미기록")}</td>
             <td class="number-cell">${workout.sets ?? "—"}세트</td>
             <td class="number-cell">${workout.reps ?? 10}회</td>
-            <td class="muscle-cell">주동: ${escapeHtml(workout.primaryMuscles?.join(", ") || "미분류")}<br>보조: ${escapeHtml(workout.secondaryMuscles?.join(", ") || "없음")}</td>
+            <td class="muscle-cell">${escapeHtml(workout.lastSetRir ?? workout.difficulty ?? workout.formStatus ?? "미기록")}</td>
           </tr>
         `).join("");
+        panel.hidden = false;
+      };
 
-        const selectRow = (row) => {
-          tableBody.querySelectorAll(".workout-history-row").forEach((item) => item.setAttribute("aria-selected", "false"));
-          row.setAttribute("aria-selected", "true");
-          const workout = entries[Number(row.dataset.exerciseIndex)].workout;
-          renderMuscleMap(buildMuscleScores([workout]), workout.name);
-        };
-        tableBody.querySelectorAll(".workout-history-row").forEach((row) => {
-          row.addEventListener("click", () => selectRow(row));
-          row.addEventListener("keydown", (event) => {
-            if (event.key !== "Enter" && event.key !== " ") return;
-            event.preventDefault();
-            selectRow(row);
+      const renderExerciseCards = (entries, scopeLabel, scores) => {
+        const workouts = entries.map((entry) => entry.workout);
+        const displayEntries = uniqueExerciseEntries(entries);
+        const exerciseList = document.getElementById("exercise-filter-list");
+        const historyPanel = document.getElementById("exercise-history-panel");
+        historyPanel.hidden = true;
+        document.getElementById("selected-workout-title").textContent = `${scopeLabel} 운동 기록`;
+        document.getElementById("selected-workout-description").textContent = "운동 박스를 선택하면 해당 종목의 모든 날짜별 수행 이력이 아래 테이블에 펼쳐진다.";
+        document.getElementById("selected-workout-volume").textContent = `${displayEntries.length}종목 · 누적 ${totalSets(workouts)}세트`;
+
+        exerciseList.innerHTML = `
+          <button class="exercise-filter" type="button" data-exercise-index="all" aria-pressed="true">
+            <strong>${escapeHtml(scopeLabel)} 전체 운동</strong>
+            <small>선택 기간의 모든 자극 부위 합산</small>
+          </button>
+          ${displayEntries.map(({ workout }, index) => `
+            <button class="exercise-filter" type="button" data-exercise-index="${index}" aria-pressed="false">
+              <strong>${escapeHtml(workout.name)}</strong>
+              <small>${escapeHtml(workout.detail || `${workout.sets ?? 0}세트 × ${workout.reps ?? 10}회`)}</small>
+              <small>주동: ${escapeHtml(workout.primaryMuscles?.join(", ") || "미분류")} · 보조: ${escapeHtml(workout.secondaryMuscles?.join(", ") || "없음")}</small>
+            </button>
+          `).join("")}
+        `;
+
+        exerciseList.querySelectorAll(".exercise-filter").forEach((button) => {
+          button.addEventListener("click", () => {
+            exerciseList.querySelectorAll(".exercise-filter").forEach((item) => item.setAttribute("aria-pressed", "false"));
+            button.setAttribute("aria-pressed", "true");
+            const index = button.dataset.exerciseIndex;
+            if (index === "all") {
+              historyPanel.hidden = true;
+              renderMuscleMap(scores, `${scopeLabel} 상체 분포`);
+              return;
+            }
+            const workout = displayEntries[Number(index)].workout;
+            renderMuscleMap(buildMuscleScores([workout]), workout.name);
+            renderExerciseHistory(workout.name);
           });
         });
       };
@@ -1650,7 +1727,7 @@
         if (dateKey === "recent") {
           document.getElementById("muscle-map-date").textContent = `최근 ${recentMuscleRecords.length}회 · ${formatDate(latestMuscleRecord.date)} 기준`;
           renderMuscleMap(overallScores, "최근 운동 전체의 상체 분포");
-          renderWorkoutTable(recentWorkoutEntries, `최근 ${recentMuscleRecords.length}회`, overallScores);
+          renderExerciseCards(recentWorkoutEntries, `최근 ${recentMuscleRecords.length}회`, overallScores);
           return;
         }
 
@@ -1660,7 +1737,7 @@
         const scores = buildMuscleScores(record.workouts);
         document.getElementById("muscle-map-date").textContent = dateLabel;
         renderMuscleMap(scores, `${dateLabel} 상체 분포`);
-        renderWorkoutTable(record.workouts.map((workout) => ({ date: record.date, workout })), dateLabel, scores);
+        renderExerciseCards(record.workouts.map((workout) => ({ date: record.date, workout })), dateLabel, scores);
       };
 
       document.getElementById("muscle-date-list").innerHTML = `
