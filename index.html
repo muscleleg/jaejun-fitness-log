@@ -1128,15 +1128,15 @@
       <div class="hero-goal">
         <strong>목표</strong>
         <div>
-          <span>옷을 입었을 때 어깨가 넓고 상체가 좋아 보이는 균형 잡힌 체형을 만든다.</span>
-          <small>우선 관찰: 측면·후면 어깨 · 상부 가슴 · 광배근 · 팔 · 자세 · 운영: 익숙한 7종목 우선</small>
+          <span id="goal-statement"></span>
+          <small id="goal-focus"></small>
         </div>
       </div>
       <div class="stats" aria-label="고정 프로필">
-        <div class="stat">키<strong>176 cm</strong></div>
-        <div class="stat">출생연도<strong>1996년</strong></div>
+        <div class="stat">키<strong id="profile-height"></strong></div>
+        <div class="stat">출생연도<strong id="profile-birth-year"></strong></div>
         <div class="stat">연 나이<strong><span id="age">계산 중</span>세</strong></div>
-        <div class="stat">기본 반복 수<strong>세트당 10회</strong></div>
+        <div class="stat">기본 반복 수<strong id="profile-default-reps"></strong></div>
       </div>
     </header>
 
@@ -1197,40 +1197,32 @@
       <div class="composition-grid" id="composition-analysis">
         <div class="empty">체성분 측정값이 들어오면 비율과 참고 범위를 계산합니다.</div>
       </div>
-      <div class="composition-note">
-        <strong>해석 주의</strong> 체지방률·FMI·FFMI 참고값은 서로 다른 모집단과 측정법에서 나온 선별 지표이며 진단 기준이 아니다. 생체전기저항 측정값은 수분 섭취·식사·운동·측정 시각에 따라 달라질 수 있으므로 같은 조건의 여러 주 추세를 우선한다.
-      </div>
-      <div class="evidence-links" aria-label="체성분 분석 기준 출처">
-        <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10088549/" target="_blank" rel="noopener">한국비만학회 2022 임상지침 ↗</a>
-        <a href="https://pubmed.ncbi.nlm.nih.gov/10966886/" target="_blank" rel="noopener">Gallagher 연령별 체지방 연구 ↗</a>
-        <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC2737140/" target="_blank" rel="noopener">NHANES FMI 분류 연구 ↗</a>
-        <a href="https://pubmed.ncbi.nlm.nih.gov/12080449/" target="_blank" rel="noopener">FFMI 연령별 참고 연구 ↗</a>
-        <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10710856/" target="_blank" rel="noopener">성인 체수분 참고 문헌 ↗</a>
-      </div>
+      <div class="composition-note" id="composition-note"></div>
+      <div class="evidence-links" id="composition-evidence-links" aria-label="체성분 분석 기준 출처"></div>
     </section>
 
     <section aria-labelledby="muscle-map-title">
       <div class="section-head">
         <div>
           <h2 id="muscle-map-title">최근 운동 자극 지도</h2>
-          <p class="muted">최근 최대 3회의 주동근과 보조근을 앞·뒤 인체 도해에 연결한다.</p>
+          <p class="muted" id="muscle-map-window-description"></p>
         </div>
         <span class="tag" id="muscle-map-date">기록 대기 중</span>
       </div>
       <div class="muscle-map-card">
         <div class="body-map-visual" aria-label="앞면과 뒷면 근육 자극 지도">
           <img src="body-map-base.png" alt="사람 몸의 앞면과 뒷면 근육 도해">
-          <span class="muscle-zone front-shoulder-left" data-muscles="측면 어깨,전면 어깨"></span>
-          <span class="muscle-zone front-shoulder-right" data-muscles="측면 어깨,전면 어깨"></span>
-          <span class="muscle-zone front-chest" data-muscles="가슴"></span>
-          <span class="muscle-zone front-biceps-left" data-muscles="이두"></span>
-          <span class="muscle-zone front-biceps-right" data-muscles="이두"></span>
-          <span class="muscle-zone back-shoulder-left" data-muscles="후면 어깨"></span>
-          <span class="muscle-zone back-shoulder-right" data-muscles="후면 어깨"></span>
-          <span class="muscle-zone back-upper" data-muscles="등"></span>
-          <span class="muscle-zone back-lats" data-muscles="광배근"></span>
-          <span class="muscle-zone back-triceps-left" data-muscles="삼두"></span>
-          <span class="muscle-zone back-triceps-right" data-muscles="삼두"></span>
+          <span class="muscle-zone front-shoulder-left"></span>
+          <span class="muscle-zone front-shoulder-right"></span>
+          <span class="muscle-zone front-chest"></span>
+          <span class="muscle-zone front-biceps-left"></span>
+          <span class="muscle-zone front-biceps-right"></span>
+          <span class="muscle-zone back-shoulder-left"></span>
+          <span class="muscle-zone back-shoulder-right"></span>
+          <span class="muscle-zone back-upper"></span>
+          <span class="muscle-zone back-lats"></span>
+          <span class="muscle-zone back-triceps-left"></span>
+          <span class="muscle-zone back-triceps-right"></span>
         </div>
         <aside class="muscle-map-info">
           <span class="tag blue">Estimated stimulus</span>
@@ -1311,14 +1303,7 @@
           </ul>
         </article>
       </div>
-      <div class="progression-rule">
-        <strong>증량 규칙</strong><br>
-        같은 중량으로 모든 세트 10회를 정확한 자세로 마치고, 마지막 세트에도 2회 이상 더 할 여유가 있는 상태가 2회 연속 확인되면 다음 운동에서 가장 작은 단위로 중량을 올린다. 10회째 자세가 무너지거나 한계라면 중량을 유지한다.
-        <div class="evidence-links">
-          <a href="https://www.acsm.org/wp-content/uploads/2026/03/Resistance-Training-Position-Stand-infographic.pdf" target="_blank" rel="noopener noreferrer">ACSM 2026 근력운동 권고</a>
-          <a href="https://pubmed.ncbi.nlm.nih.gov/38970765/" target="_blank" rel="noopener noreferrer">RIR와 근성장 메타분석</a>
-        </div>
-      </div>
+      <div class="progression-rule" id="progression-rule"></div>
     </section>
 
     <section aria-labelledby="calendar-section-title">
@@ -1434,554 +1419,10 @@
 
   <script src="assets/data/profile.js"></script>
   <script src="assets/data/exercises.js"></script>
+  <script src="assets/data/body-composition-standards.js"></script>
+  <script src="assets/data/coaching-policy.js"></script>
+  <script src="assets/data/muscle-map.js"></script>
   <script src="assets/data/records.js"></script>
-  <script>
-    const { birthYear, heightCm, defaultReps } = window.fitnessProfile;
-    const exercisesById = new Map(window.exerciseCatalog.map((exercise) => [exercise.id, exercise]));
-    const healthRecords = window.healthRecordData.map((record) => ({
-      ...record,
-      workouts: record.workouts?.map((workout) => {
-        const exercise = exercisesById.get(workout.exerciseId);
-        if (!exercise) {
-          console.warn(`등록되지 않은 운동 ID: ${workout.exerciseId}`);
-          return {
-            ...workout,
-            name: workout.exerciseId,
-            reps: workout.reps ?? defaultReps,
-            primaryMuscles: [],
-            secondaryMuscles: []
-          };
-        }
-        return {
-          ...workout,
-          name: exercise.name,
-          reps: workout.reps ?? defaultReps,
-          primaryMuscles: exercise.primaryMuscles,
-          secondaryMuscles: exercise.secondaryMuscles
-        };
-      }) ?? []
-    }));
-    const currentYear = new Date().getFullYear();
-    document.getElementById("age").textContent = currentYear - birthYear;
-
-    const escapeHtml = (value) => String(value)
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#039;");
-
-    const formatDate = (date) => new Intl.DateTimeFormat("ko-KR", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      weekday: "short"
-    }).format(new Date(`${date}T00:00:00`));
-
-    const valueWithUnit = (value, unit = "kg") =>
-      value === null || value === undefined || value === "" ? "—" : `${escapeHtml(value)} ${unit}`;
-
-    const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
-
-    const renderReferenceBar = ({ label, value, scaleMin, scaleMax, rangeMin, rangeMax }) => {
-      const toPosition = (number) => ((clamp(number, scaleMin, scaleMax) - scaleMin) / (scaleMax - scaleMin)) * 100;
-      const bandLeft = toPosition(rangeMin);
-      const bandWidth = toPosition(rangeMax) - bandLeft;
-      const markerLeft = toPosition(value);
-      return `
-        <div class="reference-row">
-          <div class="reference-labels"><span>${escapeHtml(label)}</span><span>${rangeMin}–${rangeMax}</span></div>
-          <div class="range-track" aria-label="${escapeHtml(label)} 참고 범위 ${rangeMin}에서 ${rangeMax}, 현재 ${value.toFixed(1)}">
-            <span class="range-band" style="left:${bandLeft.toFixed(2)}%;width:${bandWidth.toFixed(2)}%"></span>
-            <i class="range-marker" style="left:${markerLeft.toFixed(2)}%"></i>
-          </div>
-        </div>
-      `;
-    };
-
-    const renderCompositionAnalysis = (record) => {
-      const body = record?.body;
-      const weight = Number(body?.weight);
-      if (!Number.isFinite(weight) || weight <= 0) return;
-
-      const heightM = heightCm / 100;
-      const age = currentYear - birthYear;
-      const bmi = weight / (heightM ** 2);
-      const normalWeightMin = 18.5 * (heightM ** 2);
-      const normalWeightMax = 22.9 * (heightM ** 2);
-      const bodyFatPercent = Number.isFinite(Number(body?.bodyFat)) ? (Number(body.bodyFat) / weight) * 100 : null;
-      const bodyWaterPercent = Number.isFinite(Number(body?.bodyWater)) ? (Number(body.bodyWater) / weight) * 100 : null;
-      const skeletalMusclePercent = Number.isFinite(Number(body?.skeletalMuscle)) ? (Number(body.skeletalMuscle) / weight) * 100 : null;
-      const fatFreeMass = Number.isFinite(Number(body?.bodyFat)) ? weight - Number(body.bodyFat) : null;
-      const fatMassIndex = Number.isFinite(Number(body?.bodyFat)) ? Number(body.bodyFat) / (heightM ** 2) : null;
-      const fatFreeMassIndex = fatFreeMass === null ? null : fatFreeMass / (heightM ** 2);
-      const skeletalMuscleIndex = Number.isFinite(Number(body?.skeletalMuscle)) ? Number(body.skeletalMuscle) / (heightM ** 2) : null;
-      const muscleToFatRatio = Number.isFinite(Number(body?.skeletalMuscle)) && Number.isFinite(Number(body?.bodyFat)) && Number(body.bodyFat) > 0
-        ? Number(body.skeletalMuscle) / Number(body.bodyFat)
-        : null;
-      const bodyFatReference = age < 40
-        ? { min: 8, max: 20, label: "20–39세 남성 연구 참고" }
-        : age < 60
-          ? { min: 11, max: 22, label: "40–59세 남성 연구 참고" }
-          : { min: 13, max: 25, label: "60–79세 남성 연구 참고" };
-
-      const bmiStatus = bmi < 18.5
-        ? "한국비만학회 기준 저체중"
-        : bmi < 23
-          ? "한국비만학회 기준 정상"
-          : bmi < 25
-            ? "한국비만학회 기준 비만 전단계"
-            : bmi < 30
-              ? "한국비만학회 기준 1단계 비만"
-              : bmi < 35
-                ? "한국비만학회 기준 2단계 비만"
-                : "한국비만학회 기준 3단계 비만";
-      const bodyFatStatus = bodyFatPercent === null
-        ? "측정값 없음"
-        : bodyFatPercent < bodyFatReference.min
-          ? "연령대 남성 연구 참고 구간보다 낮음"
-          : bodyFatPercent <= bodyFatReference.max
-            ? bodyFatPercent >= bodyFatReference.max - 2
-              ? "연령대 남성 연구 참고 구간 안 · 상단 쪽"
-              : "연령대 남성 연구 참고 구간 안"
-            : "연령대 남성 연구 참고 구간보다 높음";
-      const bodyFatPositionSummary = bodyFatPercent === null
-        ? "측정값이 없다"
-        : bodyFatPercent < bodyFatReference.min
-          ? "구간보다 낮다"
-          : bodyFatPercent <= bodyFatReference.max
-            ? bodyFatPercent >= bodyFatReference.max - 2
-              ? "구간 안에서도 상단에 가깝다"
-              : "구간 안이다"
-            : "구간보다 높다";
-      const fatMassIndexStatus = fatMassIndex === null
-        ? "측정값 없음"
-        : fatMassIndex < 2
-          ? "NHANES 기반 심한 지방 부족 구간"
-          : fatMassIndex < 2.3
-            ? "NHANES 기반 중간 지방 부족 구간"
-            : fatMassIndex < 3
-              ? "NHANES 기반 가벼운 지방 부족 구간"
-              : fatMassIndex <= 6
-                ? "NHANES 기반 남성 정상 구간"
-                : fatMassIndex <= 9
-                  ? "NHANES 기반 지방 과다 구간"
-                  : "NHANES 기반 비만 구간";
-      const waterStatus = bodyWaterPercent === null
-        ? "측정값 없음"
-        : bodyWaterPercent >= 50 && bodyWaterPercent <= 65
-          ? "문헌의 일반적 성인 범위 안"
-          : "측정 조건과 반복 추세 확인 필요";
-      const ffmiDifference = fatFreeMassIndex === null ? null : fatFreeMassIndex - 18.9;
-      const verdictTitle = bodyFatPercent === null
-        ? "현재 위치: 체중은 정상 범위, 지방·제지방 평가는 측정값이 더 필요"
-        : "현재 위치: 체중과 지방은 건강 참고 구간, 상체 근육 증가가 더 직접적인 우선순위";
-      const verdictBody = bodyFatPercent === null
-        ? `BMI ${bmi.toFixed(1)}는 한국 정상 체중 범위다. 체지방량이 없는 날은 이전 값을 가져오지 않으므로 지방·제지방 지표를 판정하지 않는다.`
-        : `BMI ${bmi.toFixed(1)}와 FMI ${fatMassIndex.toFixed(1)}는 각각 한국 정상 체중·NHANES 남성 정상 지방량 구간이다. 체지방률 ${bodyFatPercent.toFixed(1)}%는 ${escapeHtml(bodyFatReference.label)} ${escapeHtml(bodyFatPositionSummary)}. 현재 수치만 보면 큰 폭의 감량보다 체지방이 빠르게 늘지 않도록 관리하면서 제지방·골격근량을 늘리는 방향이 목표에 더 맞다.`;
-
-      document.getElementById("composition-analysis-date").textContent = formatDate(record.date);
-      document.getElementById("composition-verdict").innerHTML = `
-        <strong>${escapeHtml(verdictTitle)}</strong>
-        ${verdictBody}
-      `;
-      document.getElementById("composition-analysis").innerHTML = `
-        <article class="composition-card">
-          <div class="composition-card-head"><h3>BMI</h3><span class="composition-value">${bmi.toFixed(1)}</span></div>
-          <p class="composition-status">${escapeHtml(bmiStatus)}</p>
-          <div class="reference-stack">
-            ${renderReferenceBar({ label: "한국 성인 정상 BMI", value: bmi, scaleMin: 15, scaleMax: 35, rangeMin: 18.5, rangeMax: 22.9 })}
-          </div>
-          <p class="composition-detail">176cm 기준 한국 정상 체중 범위는 약 ${normalWeightMin.toFixed(1)}–${normalWeightMax.toFixed(1)}kg. 현재 ${weight.toFixed(1)}kg은 범위 안이며, BMI는 지방과 근육을 구분하지 못한다.</p>
-        </article>
-        <article class="composition-card">
-          <div class="composition-card-head"><h3>체지방률</h3><span class="composition-value">${bodyFatPercent === null ? "—" : `${bodyFatPercent.toFixed(1)}%`}</span></div>
-          <p class="composition-status">${escapeHtml(bodyFatStatus)}</p>
-          ${bodyFatPercent === null ? "" : `<div class="reference-stack">
-            ${renderReferenceBar({ label: bodyFatReference.label, value: bodyFatPercent, scaleMin: 5, scaleMax: 35, rangeMin: bodyFatReference.min, rangeMax: bodyFatReference.max })}
-          </div>`}
-          <p class="composition-detail">체지방량 ${valueWithUnit(body?.bodyFat)} ÷ 체중 ${weight.toFixed(1)}kg. Gallagher 연구가 BMI 경계와 연령·성별을 연결해 제안한 참고 구간이며 공식 진단선은 아니다.</p>
-        </article>
-        <article class="composition-card">
-          <div class="composition-card-head"><h3>체지방량지수 · FMI</h3><span class="composition-value">${fatMassIndex === null ? "—" : fatMassIndex.toFixed(1)}</span></div>
-          <p class="composition-status">${escapeHtml(fatMassIndexStatus)}</p>
-          ${fatMassIndex === null ? "" : `<div class="reference-stack">
-            ${renderReferenceBar({ label: "NHANES 남성 정상 FMI", value: fatMassIndex, scaleMin: 0, scaleMax: 12, rangeMin: 3, rangeMax: 6 })}
-          </div>`}
-          <p class="composition-detail">체지방량 ÷ 키²로 체지방을 키에 맞춰 비교한다. 현재 약 ${fatMassIndex?.toFixed(1) ?? "—"}kg/m²로 남성 정상 분류 3–6kg/m² 안이다.</p>
-        </article>
-        <article class="composition-card">
-          <div class="composition-card-head"><h3>제지방량지수 · FFMI</h3><span class="composition-value">${fatFreeMassIndex === null ? "—" : fatFreeMassIndex.toFixed(1)}</span></div>
-          <p class="composition-status">${fatFreeMassIndex === null ? "측정값 없음" : `젊은 남성 연구 중앙값 18.9보다 ${Math.abs(ffmiDifference).toFixed(1)} ${ffmiDifference >= 0 ? "높음" : "낮음"}`}</p>
-          <p class="composition-detail">제지방량 ${fatFreeMass?.toFixed(1) ?? "—"}kg ÷ 키². 현재 ${fatFreeMassIndex?.toFixed(1) ?? "—"}kg/m²는 근육을 포함한 지방 이외 조직의 크기를 보여준다. 비교 연구는 스위스 백인 표본이므로 결핍 판정이 아니라 근육 증가 추세의 보조 기준으로만 사용한다.</p>
-        </article>
-        <article class="composition-card">
-          <div class="composition-card-head"><h3>체수분률</h3><span class="composition-value">${bodyWaterPercent === null ? "—" : `${bodyWaterPercent.toFixed(1)}%`}</span></div>
-          <p class="composition-status">${escapeHtml(waterStatus)}</p>
-          ${bodyWaterPercent === null ? "" : `<div class="reference-stack">
-            ${renderReferenceBar({ label: "일반적 성인 참고", value: bodyWaterPercent, scaleMin: 40, scaleMax: 75, rangeMin: 50, rangeMax: 65 })}
-          </div>`}
-          <p class="composition-detail">체수분 ${valueWithUnit(body?.bodyWater, "L")} ÷ 체중 ${weight.toFixed(1)}kg. 하루 수분 상태 판정값이 아니라 반복 측정용 지표다.</p>
-        </article>
-        <article class="composition-card">
-          <div class="composition-card-head"><h3>골격근 지표</h3><span class="composition-value">${skeletalMusclePercent === null ? "—" : `${skeletalMusclePercent.toFixed(1)}%`}</span></div>
-          <p class="composition-status">공인 정상 범위 없음 · 현재 기준점</p>
-          <p class="composition-detail">골격근량/체중 ${skeletalMusclePercent?.toFixed(1) ?? "—"}% · 골격근량/키² ${skeletalMuscleIndex?.toFixed(1) ?? "—"}kg/m² · 골격근/지방 ${muscleToFatRatio?.toFixed(2) ?? "—"}배. 전신 골격근량은 사지근육량 기반 근감소증 기준과 비교할 수 없어 같은 기기의 변화만 본다.</p>
-        </article>
-      `;
-    };
-
-    const renderNutritionEstimate = (estimate) => estimate ? `
-      <div class="estimate-box">
-        <div class="estimate-values">
-          <span>추정 열량 ${escapeHtml(estimate.calories)}</span>
-          <span>추정 단백질 ${escapeHtml(estimate.protein)}</span>
-        </div>
-        <small><strong>가정:</strong> ${escapeHtml(estimate.assumptions)}</small>
-        <small><strong>판단 기준:</strong> ${escapeHtml(estimate.target)}</small>
-        ${estimate.sources?.length ? `<div class="estimate-sources">${estimate.sources.map((source) => `<a href="${escapeHtml(source.href)}" target="_blank" rel="noopener noreferrer">${escapeHtml(source.label)}</a>`).join("")}</div>` : ""}
-      </div>
-    ` : "";
-
-    const sortedRecords = [...healthRecords].sort((a, b) => b.date.localeCompare(a.date));
-    const recordsWithBody = sortedRecords.filter((record) => record.body && Object.values(record.body).some((value) => value !== null && value !== undefined && value !== ""));
-    const recordsWithWorkout = sortedRecords.filter((record) => record.workouts?.length);
-    const recordsWithMeals = sortedRecords.filter((record) => record.meals?.length);
-
-    const recentMuscleRecords = recordsWithWorkout.slice(0, 3);
-    const latestMuscleRecord = recentMuscleRecords[0];
-    if (latestMuscleRecord) {
-      const buildMuscleScores = (workouts) => {
-        const scores = new Map();
-        const addScore = (muscle, score) => scores.set(muscle, (scores.get(muscle) ?? 0) + score);
-        workouts.forEach((workout) => {
-          workout.primaryMuscles?.forEach((muscle) => addScore(muscle, workout.sets ?? 0));
-          workout.secondaryMuscles?.forEach((muscle) => addScore(muscle, (workout.sets ?? 0) * 0.5));
-        });
-        return scores;
-      };
-
-      const muscleLevel = (score, maxScore) => {
-        const ratio = maxScore ? score / maxScore : 0;
-        return ratio >= 0.8 ? 3 : ratio >= 0.4 ? 2 : ratio > 0 ? 1 : 0;
-      };
-      const levelLabel = { 1: "낮음", 2: "중간", 3: "높음" };
-
-      const renderMuscleMap = (scores, title) => {
-        const maxScore = Math.max(0, ...scores.values());
-        document.getElementById("muscle-map-selection").textContent = title;
-
-        document.querySelectorAll(".muscle-zone").forEach((zone) => {
-          const muscles = zone.dataset.muscles.split(",");
-          const score = Math.max(...muscles.map((muscle) => scores.get(muscle) ?? 0));
-          zone.dataset.level = muscleLevel(score, maxScore);
-        });
-
-        document.getElementById("muscle-tags").innerHTML = [...scores.entries()]
-          .sort((a, b) => b[1] - a[1])
-          .map(([muscle, score]) => {
-            const level = muscleLevel(score, maxScore);
-            return `<span class="muscle-chip level-${level}">${escapeHtml(muscle)} · ${levelLabel[level]}</span>`;
-          })
-          .join("");
-      };
-
-      const recentWorkoutEntries = recentMuscleRecords.flatMap((record) =>
-        record.workouts.map((workout) => ({ date: record.date, workout }))
-      );
-      const recentWorkouts = recentWorkoutEntries.map((entry) => entry.workout);
-      const overallScores = buildMuscleScores(recentWorkouts);
-      const totalSets = (workouts) => workouts.reduce((sum, workout) => sum + (workout.sets ?? 0), 0);
-
-      const uniqueExerciseEntries = (entries) => {
-        const seen = new Set();
-        return entries.filter(({ workout }) => {
-          if (seen.has(workout.name)) return false;
-          seen.add(workout.name);
-          return true;
-        });
-      };
-
-      const renderHistoryTable = (title, description, historyEntries) => {
-        const panel = document.getElementById("exercise-history-panel");
-        const tableBody = document.getElementById("workout-history-table-body");
-        document.getElementById("exercise-history-title").textContent = title;
-        document.getElementById("exercise-history-description").textContent = description;
-        tableBody.innerHTML = historyEntries.map(({ date, workout }) => `
-          <tr>
-            <td class="date-cell" data-label="날짜">${escapeHtml(formatDate(date))}</td>
-            <td class="exercise-cell" data-label="운동">${escapeHtml(workout.name)}</td>
-            <td class="detail-cell" data-label="중량·수행">${escapeHtml(workout.detail || "상세 중량 미기록")}</td>
-            <td class="number-cell" data-label="세트">${workout.sets ?? "—"}세트</td>
-            <td class="number-cell" data-label="횟수">${workout.reps ?? 10}회</td>
-            <td class="muscle-cell" data-label="난이도·자세">${escapeHtml(workout.lastSetRir ?? workout.difficulty ?? workout.formStatus ?? "미기록")}</td>
-          </tr>
-        `).join("");
-        panel.hidden = false;
-      };
-
-      const renderExerciseHistory = (exerciseName) => {
-        const historyEntries = recordsWithWorkout.flatMap((record) =>
-          record.workouts
-            .filter((workout) => workout.name === exerciseName)
-            .map((workout) => ({ date: record.date, workout }))
-        );
-        renderHistoryTable(
-          `${exerciseName} 수행 이력`,
-          `${historyEntries.length}회 기록 · 날짜별 중량과 수행 품질 변화를 비교한다.`,
-          historyEntries
-        );
-      };
-
-      const renderExerciseCards = (entries, scopeLabel, scores) => {
-        const workouts = entries.map((entry) => entry.workout);
-        const displayEntries = uniqueExerciseEntries(entries);
-        const exerciseList = document.getElementById("exercise-filter-list");
-        const historyPanel = document.getElementById("exercise-history-panel");
-        historyPanel.hidden = true;
-        document.getElementById("selected-workout-title").textContent = `${scopeLabel} 운동 기록`;
-        document.getElementById("selected-workout-description").textContent = "전체 운동 박스는 선택 기간의 전체 목록을, 개별 운동 박스는 해당 종목의 모든 날짜별 이력을 펼친다.";
-        document.getElementById("selected-workout-volume").textContent = `${displayEntries.length}종목 · 누적 ${totalSets(workouts)}세트`;
-
-        exerciseList.innerHTML = `
-          <button class="exercise-filter" type="button" data-exercise-index="all" aria-pressed="true">
-            <strong>${escapeHtml(scopeLabel)} 전체 운동</strong>
-            <small>선택 기간의 자극 합산 · 누르면 전체 운동 목록 표시</small>
-          </button>
-          ${displayEntries.map(({ workout }, index) => `
-            <button class="exercise-filter" type="button" data-exercise-index="${index}" aria-pressed="false">
-              <strong>${escapeHtml(workout.name)}</strong>
-              <small>${escapeHtml(workout.detail || `${workout.sets ?? 0}세트 × ${workout.reps ?? 10}회`)}</small>
-              <small>주동: ${escapeHtml(workout.primaryMuscles?.join(", ") || "미분류")} · 보조: ${escapeHtml(workout.secondaryMuscles?.join(", ") || "없음")}</small>
-            </button>
-          `).join("")}
-        `;
-
-        exerciseList.querySelectorAll(".exercise-filter").forEach((button) => {
-          button.addEventListener("click", () => {
-            exerciseList.querySelectorAll(".exercise-filter").forEach((item) => item.setAttribute("aria-pressed", "false"));
-            button.setAttribute("aria-pressed", "true");
-            const index = button.dataset.exerciseIndex;
-            if (index === "all") {
-              renderMuscleMap(scores, `${scopeLabel} 상체 분포`);
-              renderHistoryTable(
-                `${scopeLabel} 전체 운동 목록`,
-                `${entries.length}개 수행 기록 · 선택한 기간에 실시한 모든 운동을 날짜별로 표시한다.`,
-                entries
-              );
-              return;
-            }
-            const workout = displayEntries[Number(index)].workout;
-            renderMuscleMap(buildMuscleScores([workout]), workout.name);
-            renderExerciseHistory(workout.name);
-          });
-        });
-      };
-
-      const selectMuscleDate = (dateKey) => {
-        document.querySelectorAll(".muscle-date-filter").forEach((button) => {
-          button.setAttribute("aria-pressed", String(button.dataset.date === dateKey));
-        });
-
-        if (dateKey === "recent") {
-          document.getElementById("muscle-map-date").textContent = `최근 ${recentMuscleRecords.length}회 · ${formatDate(latestMuscleRecord.date)} 기준`;
-          renderMuscleMap(overallScores, "최근 운동 전체의 상체 분포");
-          renderExerciseCards(recentWorkoutEntries, `최근 ${recentMuscleRecords.length}회`, overallScores);
-          return;
-        }
-
-        const record = recentMuscleRecords.find((item) => item.date === dateKey);
-        if (!record) return;
-        const dateLabel = formatDate(record.date);
-        const scores = buildMuscleScores(record.workouts);
-        document.getElementById("muscle-map-date").textContent = dateLabel;
-        renderMuscleMap(scores, `${dateLabel} 상체 분포`);
-        renderExerciseCards(record.workouts.map((workout) => ({ date: record.date, workout })), dateLabel, scores);
-      };
-
-      document.getElementById("muscle-date-list").innerHTML = `
-        <button class="muscle-date-filter" type="button" data-date="recent" aria-pressed="true">최근 ${recentMuscleRecords.length}회 전체</button>
-        ${recentMuscleRecords.map((record) => `
-          <button class="muscle-date-filter" type="button" data-date="${record.date}" aria-pressed="false">${escapeHtml(formatDate(record.date))}</button>
-        `).join("")}
-      `;
-      document.querySelectorAll(".muscle-date-filter").forEach((button) => {
-        button.addEventListener("click", () => selectMuscleDate(button.dataset.date));
-      });
-      selectMuscleDate("recent");
-    }
-
-    const latestWorkoutDate = recordsWithWorkout[0]?.date;
-    const initialCalendarDate = latestWorkoutDate
-      ? new Date(`${latestWorkoutDate}T00:00:00`)
-      : new Date();
-    let calendarYear = initialCalendarDate.getFullYear();
-    let calendarMonth = initialCalendarDate.getMonth();
-
-    const toDateKey = (year, month, day) =>
-      `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-
-    const renderCalendar = () => {
-      const firstDay = new Date(calendarYear, calendarMonth, 1);
-      const lastDay = new Date(calendarYear, calendarMonth + 1, 0);
-      const leadingDays = firstDay.getDay();
-      const totalCells = Math.ceil((leadingDays + lastDay.getDate()) / 7) * 7;
-      const workoutMap = new Map(recordsWithWorkout.map((record) => [record.date, record]));
-
-      document.getElementById("calendar-title").textContent = `${calendarYear}년 ${calendarMonth + 1}월`;
-
-      const cells = [];
-      for (let index = 0; index < totalCells; index += 1) {
-        const cellDate = new Date(calendarYear, calendarMonth, index - leadingDays + 1);
-        const year = cellDate.getFullYear();
-        const month = cellDate.getMonth();
-        const day = cellDate.getDate();
-        const dateKey = toDateKey(year, month, day);
-        const record = workoutMap.get(dateKey);
-        const outside = month !== calendarMonth;
-        const exerciseCount = record?.workouts?.length ?? 0;
-        const ariaLabel = record
-          ? `${year}년 ${month + 1}월 ${day}일, 운동 ${exerciseCount}종목`
-          : `${year}년 ${month + 1}월 ${day}일`;
-
-        cells.push(`<div class="calendar-day${outside ? " outside" : ""}${record ? " workout" : ""}" role="gridcell" aria-label="${ariaLabel}"><span>${day}</span></div>`);
-      }
-
-      document.getElementById("calendar-grid").innerHTML = cells.join("");
-
-      const monthWorkouts = recordsWithWorkout.filter((record) => {
-        const date = new Date(`${record.date}T00:00:00`);
-        return date.getFullYear() === calendarYear && date.getMonth() === calendarMonth;
-      });
-      const exerciseTotal = monthWorkouts.reduce((sum, record) => sum + record.workouts.length, 0);
-      document.getElementById("calendar-summary").textContent = monthWorkouts.length
-        ? `${calendarMonth + 1}월 운동 ${monthWorkouts.length}일 · 기록된 종목 ${exerciseTotal}개`
-        : `${calendarMonth + 1}월에는 아직 운동 기록이 없습니다.`;
-    };
-
-    document.getElementById("calendar-prev").addEventListener("click", () => {
-      calendarMonth -= 1;
-      if (calendarMonth < 0) {
-        calendarMonth = 11;
-        calendarYear -= 1;
-      }
-      renderCalendar();
-    });
-
-    document.getElementById("calendar-next").addEventListener("click", () => {
-      calendarMonth += 1;
-      if (calendarMonth > 11) {
-        calendarMonth = 0;
-        calendarYear += 1;
-      }
-      renderCalendar();
-    });
-
-    renderCalendar();
-
-    document.getElementById("total-days").textContent = `${sortedRecords.length}일`;
-    document.getElementById("workout-days").textContent = `${recordsWithWorkout.length}일`;
-    document.getElementById("meal-days").textContent = `${recordsWithMeals.length}일`;
-
-    if (sortedRecords.length) {
-      const latest = sortedRecords[0];
-      const latestWorkout = latest.workouts?.length ? `${latest.workouts.length}종목` : "—";
-      const totalSets = latest.workouts?.reduce((sum, workout) => sum + (workout.sets ?? 0), 0) ?? 0;
-
-      document.getElementById("latest-date").textContent = formatDate(latest.date);
-      document.getElementById("latest-metrics").innerHTML = `
-        <div class="metric"><span>몸무게</span><strong>${valueWithUnit(latest.body?.weight)}</strong></div>
-        <div class="metric"><span>골격근량</span><strong>${valueWithUnit(latest.body?.skeletalMuscle)}</strong></div>
-        <div class="metric"><span>체지방량</span><strong>${valueWithUnit(latest.body?.bodyFat)}</strong></div>
-        <div class="metric"><span>체수분</span><strong>${valueWithUnit(latest.body?.bodyWater, "L")}</strong></div>
-        <div class="metric"><span>최근 운동</span><strong>${escapeHtml(latestWorkout)}</strong></div>
-      `;
-
-      document.getElementById("session-summary").innerHTML = `
-        <div class="metric"><span>운동량</span><strong>${latest.workouts?.length ? `${latest.workouts.length}종목 · ${totalSets}세트` : "—"}</strong></div>
-        <div class="metric"><span>추정 섭취 열량</span><strong>${latest.nutritionEstimate ? escapeHtml(latest.nutritionEstimate.calories) : "—"}</strong></div>
-        <div class="metric"><span>추정 단백질</span><strong>${latest.nutritionEstimate ? `${escapeHtml(latest.nutritionEstimate.protein)} / 목표 약 105g` : "—"}</strong></div>
-      `;
-
-      renderCompositionAnalysis(latest);
-
-      if (latest.advice) {
-        const feedbackContent = latest.advice.points?.length
-          ? `<ul class="feedback-points">${latest.advice.points.map((point) => `<li><strong>${escapeHtml(point.label)}</strong>${escapeHtml(point.text)}</li>`).join("")}</ul>`
-          : escapeHtml(latest.advice.body ?? "");
-        document.getElementById("advice").innerHTML = `<strong class="feedback-title">${escapeHtml(latest.advice.title)}</strong>${feedbackContent}`;
-      }
-
-      if (latest.actions?.length) {
-        document.getElementById("next-actions").innerHTML = latest.actions
-          .map((action) => `<li>${escapeHtml(action)}</li>`)
-          .join("");
-      }
-    }
-
-    if (recordsWithBody.length) {
-      document.getElementById("body-history-wrap").hidden = false;
-      document.getElementById("body-history-empty").hidden = true;
-      document.getElementById("body-history").innerHTML = recordsWithBody.map((record) => `
-        <tr>
-          <td data-label="날짜">${escapeHtml(formatDate(record.date))}</td>
-          <td data-label="몸무게">${valueWithUnit(record.body?.weight)}</td>
-          <td data-label="골격근량">${valueWithUnit(record.body?.skeletalMuscle)}</td>
-          <td data-label="체지방량">${valueWithUnit(record.body?.bodyFat)}</td>
-          <td data-label="체수분">${valueWithUnit(record.body?.bodyWater, "L")}</td>
-        </tr>
-      `).join("");
-    }
-
-    if (recordsWithMeals.length) {
-      document.getElementById("nutrition-list").innerHTML = recordsWithMeals.map((record) => `
-        <article class="record">
-          <time datetime="${escapeHtml(record.date)}">${escapeHtml(formatDate(record.date))}</time>
-          <div>
-            ${record.meals.map((meal) => `
-              <h4>${escapeHtml(meal.label)}</h4>
-              <p>${escapeHtml(meal.items.join(", "))}</p>
-            `).join("")}
-            ${renderNutritionEstimate(record.nutritionEstimate)}
-          </div>
-        </article>
-      `).join("");
-    }
-
-    if (recordsWithWorkout.length) {
-      document.getElementById("workout-list").innerHTML = recordsWithWorkout.map((record) => `
-        <article class="record">
-          <time datetime="${escapeHtml(record.date)}">${escapeHtml(formatDate(record.date))}</time>
-          <div>
-            <ul class="plain-list">
-              ${record.workouts.map((workout) => `<li><strong>${escapeHtml(workout.name)}</strong>${workout.detail ? ` · ${escapeHtml(workout.detail)}` : ""}</li>`).join("")}
-            </ul>
-          </div>
-        </article>
-      `).join("");
-    }
-
-    if (sortedRecords.length) {
-      document.getElementById("record-list").innerHTML = sortedRecords.map((record) => `
-        <article class="record">
-          <time datetime="${escapeHtml(record.date)}">${escapeHtml(formatDate(record.date))}</time>
-          <div class="record-columns">
-            <div>
-              <h4>상태</h4>
-              <p>몸무게 ${valueWithUnit(record.body?.weight)} · 골격근량 ${valueWithUnit(record.body?.skeletalMuscle)} · 체지방량 ${valueWithUnit(record.body?.bodyFat)} · 체수분 ${valueWithUnit(record.body?.bodyWater, "L")}</p>
-              ${record.condition ? `<p class="muted">${escapeHtml(record.condition)}</p>` : ""}
-            </div>
-            <div>
-              <h4>운동</h4>
-              <p>${record.workouts?.length ? record.workouts.map((workout) => `${escapeHtml(workout.name)}${workout.detail ? ` (${escapeHtml(workout.detail)})` : ""}`).join(", ") : "기록 없음"}</p>
-              <h4 style="margin-top: 14px;">식사</h4>
-              <p>${record.meals?.length ? record.meals.map((meal) => `${escapeHtml(meal.label)}: ${escapeHtml(meal.items.join(", "))}`).join(" / ") : "기록 없음"}</p>
-              ${renderNutritionEstimate(record.nutritionEstimate)}
-            </div>
-          </div>
-        </article>
-      `).join("");
-    }
-  </script>
+  <script src="assets/js/app.js"></script>
 </body>
 </html>
