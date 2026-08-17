@@ -1432,72 +1432,37 @@
     <footer class="footer">개인 헬스 기록 · 실제 기록에 근거해 계속 갱신합니다.</footer>
   </main>
 
+  <script src="assets/data/profile.js"></script>
+  <script src="assets/data/exercises.js"></script>
+  <script src="assets/data/records.js"></script>
   <script>
-    const birthYear = 1996;
-    const heightCm = 176;
+    const { birthYear, heightCm, defaultReps } = window.fitnessProfile;
+    const exercisesById = new Map(window.exerciseCatalog.map((exercise) => [exercise.id, exercise]));
+    const healthRecords = window.healthRecordData.map((record) => ({
+      ...record,
+      workouts: record.workouts?.map((workout) => {
+        const exercise = exercisesById.get(workout.exerciseId);
+        if (!exercise) {
+          console.warn(`등록되지 않은 운동 ID: ${workout.exerciseId}`);
+          return {
+            ...workout,
+            name: workout.exerciseId,
+            reps: workout.reps ?? defaultReps,
+            primaryMuscles: [],
+            secondaryMuscles: []
+          };
+        }
+        return {
+          ...workout,
+          name: exercise.name,
+          reps: workout.reps ?? defaultReps,
+          primaryMuscles: exercise.primaryMuscles,
+          secondaryMuscles: exercise.secondaryMuscles
+        };
+      }) ?? []
+    }));
     const currentYear = new Date().getFullYear();
     document.getElementById("age").textContent = currentYear - birthYear;
-
-    // 새 기록은 날짜별 객체로 이 배열에 계속 추가한다. 기존 기록은 덮어쓰지 않는다.
-    const healthRecords = [
-      {
-        date: "2026-08-16",
-        body: {
-          weight: 65.9,
-          skeletalMuscle: 28.9,
-          bodyFat: 12.3,
-          bodyWater: 39.3
-        },
-        workouts: [
-          { name: "로우 케이블 원암 레터럴 레이즈", sets: 5, reps: 10, primaryMuscles: ["측면 어깨"], secondaryMuscles: [], detail: "한 팔당 5kg · 양쪽 각 5세트 × 10회" },
-          { name: "시티드 로우", sets: 5, reps: 10, primaryMuscles: ["등"], secondaryMuscles: ["광배근", "후면 어깨", "이두"], detail: "30kg · 5세트 × 10회" },
-          { name: "케이블 오버헤드 트라이셉스 익스텐션", sets: 5, reps: 10, primaryMuscles: ["삼두"], secondaryMuscles: [], detail: "25kg · 5세트 × 10회" },
-          { name: "어시스트 풀업 머신", sets: 5, reps: 10, primaryMuscles: ["광배근"], secondaryMuscles: ["등", "이두"], detail: "표시 중량 35kg · 5세트 × 10회 · 보조 중량 여부 미확인" },
-          { name: "리버스 펙덱 플라이", sets: 5, reps: 10, primaryMuscles: ["후면 어깨"], secondaryMuscles: ["등"], detail: "10kg 3세트 × 10회 + 15kg 2세트 × 10회 · 사진 기준 후면 어깨 동작" },
-          { name: "덤벨 숄더프레스", sets: 5, reps: 10, primaryMuscles: ["전면 어깨"], secondaryMuscles: ["측면 어깨", "삼두"], detail: "덤벨 각 4kg · 5세트 × 10회" },
-          { name: "머신 체스트프레스", sets: 5, reps: 10, primaryMuscles: ["가슴"], secondaryMuscles: ["전면 어깨", "삼두"], detail: "30kg · 5세트 × 10회" }
-        ],
-        meals: [
-          { label: "음료·간식", items: ["스타벅스 아이스 카페 라떼 (사이즈·우유 종류 미확인)", "치킨팝 과자", "파스퇴르 야채농장 1팩 추정 (제품 종류·용량 미확인)", "빙그레 더단백 드링크 1팩 (단백질 20g, 맛 미확인)"] },
-          { label: "점심", items: ["쌀국수", "모닝글로리 볶음"] },
-          { label: "저녁", items: ["부침개", "된장국", "밥"] }
-        ],
-        nutritionEstimate: {
-          calories: "약 1,600~2,200 kcal",
-          protein: "약 66~103g",
-          assumptions: "스타벅스 아이스 카페 라떼를 일반 우유 Tall 355ml 1잔(약 110kcal·단백질 6g)으로 가정하고, 치킨팝 65g 한 봉지, 파스퇴르 야채농장 1팩(종류에 따라 약 65~110kcal), 빙그레 더단백 드링크 1팩(약 105~115kcal·단백질 20g), 쌀국수·모닝글로리 볶음·부침개·된장국·밥을 각각 보통 1인분으로 가정한 범위 추정치. 라떼 사이즈나 우유 변경 시 달라질 수 있음",
-          target: "건강한 운동 성인 기준 현재 체중 65.9kg의 단백질 참고 범위는 약 92~132g/일이며, 우선 목표는 약 105g/일(1.6g/kg)로 잡는다.",
-          sources: [
-            { label: "스타벅스 코리아 음료 영양정보", href: "https://www.starbucks.co.kr/menu/drink_list.do?CATE_CD=product_espresso" },
-            { label: "오리온 치킨팝 제품정보", href: "https://www.orionworld.com/goods/view/25?badge=&category=&goodsno=18&keyname=&keyword=&page=1" },
-            { label: "파스퇴르 야채농장 제품별 영양", href: "https://www.inout.team/search/food?keyword=%EC%95%BC%EC%B1%84%EB%86%8D%EC%9E%A5" },
-            { label: "빙그레 더단백 제품 영양", href: "https://prod.danawa.com/info/?pcode=110119173" },
-            { label: "쌀국수·모닝글로리 영양표", href: "https://content.phocafe.co.uk/wp-content/uploads/2025/01/Pho-Nutritional-Guidelines-2024_web.pdf" },
-            { label: "식품안전나라 식품교환표", href: "https://www.foodsafetykorea.go.kr/portal/board/boardDetail.do?bbs_no=bbs039&menu_grp=MENU_NEW03&menu_no=4847&ntctxt_no=22498" },
-            { label: "운동 성인 단백질 근거", href: "https://pmc.ncbi.nlm.nih.gov/articles/PMC5477153/" }
-          ]
-        },
-        condition: "주관적 운동 강도와 식사량은 미기록",
-        advice: {
-          title: "현재 판정: 7종목은 유지하고, 추가보다 수행 품질과 증량 시점을 관리한다",
-          points: [
-            { label: "종목 구성", text: "수평·수직 당기기와 가슴·어깨 밀기, 측면·후면 어깨, 삼두가 모두 있어 새 종목을 바로 추가할 필요는 없다." },
-            { label: "관찰 대상", text: "상부 가슴은 체스트프레스 각도에 따라, 이두는 직접 운동이 없다는 점에서 향후 부족 여부를 확인한다." },
-            { label: "훈련량 주의", text: "세트당 10회로 총 35세트다. 주 몇 회 반복하는지와 마지막 세트 여유를 알아야 과하거나 적은지 판단할 수 있다." },
-            { label: "현재 체성분 위치", text: "BMI 21.3과 체지방량지수(FMI) 4.0은 각각 한국 정상 체중·NHANES 남성 정상 지방량 구간이다. 큰 폭의 감량보다 체지방 급증 없이 골격근과 제지방을 늘리는 방향이 현재 목표에 더 맞다." },
-            { label: "영양", text: "아이스 카페 라떼, 야채농장과 더단백을 포함해 약 1,600~2,200kcal와 단백질 66~103g으로 추정한다. 우선 목표 105g보다 약 2~39g 부족했을 가능성이 있다." },
-            { label: "증량 판단", text: "이번 한 번의 5세트×10회 기록만으로는 증량하지 않는다. 자세와 남은 반복 여유가 2회 연속 확인되면 올린다." }
-          ]
-        },
-        actions: [
-          "다음 상체 운동도 같은 7종목으로 진행하고, 새 운동은 아직 추가하지 않는다.",
-          "각 종목 마지막 세트가 쉬움(3회 이상 가능)·적당(1~2회 가능)·한계(0회) 중 어디였는지 기록한다.",
-          "모든 세트 10회와 2회 이상의 여유가 2번 연속 확인된 종목만 다음 최소 단위로 증량한다.",
-          "주당 이 상체 루틴을 몇 회 할 계획인지 기록해 35세트의 적정성을 판단한다.",
-          "아이스 카페 라떼와 더단백을 포함해도 단백질이 약 2~39g 부족할 수 있으므로 다음 끼니에서 단백질 식품을 보완한다."
-        ]
-      }
-    ];
 
     const escapeHtml = (value) => String(value)
       .replaceAll("&", "&amp;")
