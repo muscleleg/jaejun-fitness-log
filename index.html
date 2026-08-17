@@ -415,6 +415,56 @@
 
     .exercise-map-guide h3 { margin: 0 0 4px; }
 
+    .muscle-date-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      margin-top: 14px;
+    }
+
+    .muscle-date-filter {
+      min-width: 150px;
+      padding: 11px 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+      font-weight: 800;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .muscle-date-filter:hover,
+    .muscle-date-filter:focus-visible {
+      border-color: #8cc7a8;
+      outline: 3px solid rgba(24, 121, 78, 0.10);
+    }
+
+    .muscle-date-filter[aria-pressed="true"] {
+      border-color: var(--green);
+      background: var(--green);
+      color: #fff;
+    }
+
+    .selected-workout-summary {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: end;
+      margin-top: 22px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+    }
+
+    .selected-workout-summary h3 { margin: 0 0 4px; }
+
+    .selected-workout-summary strong {
+      flex: 0 0 auto;
+      color: var(--green);
+      font-size: 0.9rem;
+    }
+
     .exercise-filter-list {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -929,6 +979,8 @@
       .calendar-day.workout::after { content: ""; width: 7px; height: 7px; padding: 0; }
       .hero-goal { align-items: flex-start; flex-direction: column; }
       .exercise-filter-list { grid-template-columns: 1fr; }
+      .muscle-date-filter { flex: 1 1 140px; }
+      .selected-workout-summary { align-items: start; flex-direction: column; gap: 4px; }
     }
   </style>
 </head>
@@ -1060,8 +1112,16 @@
           </div>
         </aside>
         <div class="exercise-map-guide">
-          <h3>운동별 자극 연결</h3>
-          <p class="muted">운동을 선택하면 해당 운동의 주동근과 보조근만 지도에 표시한다.</p>
+          <h3>날짜별 운동 기록</h3>
+          <p class="muted">최근 전체 또는 날짜를 선택하면 그 기간의 운동량과 운동 목록을 확인할 수 있다.</p>
+          <div class="muscle-date-list" id="muscle-date-list" aria-label="자극 지도 운동 날짜 선택"></div>
+          <div class="selected-workout-summary">
+            <div>
+              <h3 id="selected-workout-title">운동별 자극 연결</h3>
+              <p class="muted" id="selected-workout-description">운동을 선택하면 해당 운동의 주동근과 보조근만 지도에 표시한다.</p>
+            </div>
+            <strong id="selected-workout-volume"></strong>
+          </div>
           <div class="exercise-filter-list" id="exercise-filter-list"></div>
         </div>
       </div>
@@ -1530,37 +1590,75 @@
 
       const recentWorkouts = recentMuscleRecords.flatMap((record) => record.workouts);
       const overallScores = buildMuscleScores(recentWorkouts);
+      const totalSets = (workouts) => workouts.reduce((sum, workout) => sum + (workout.sets ?? 0), 0);
 
-      document.getElementById("muscle-map-date").textContent = `최근 ${recentMuscleRecords.length}회 · ${formatDate(latestMuscleRecord.date)} 기준`;
-      renderMuscleMap(overallScores, "최근 운동 전체의 상체 분포");
+      const renderExerciseList = (workouts, scopeLabel, scores) => {
+        const exerciseList = document.getElementById("exercise-filter-list");
+        document.getElementById("selected-workout-title").textContent = `${scopeLabel} 운동 기록`;
+        document.getElementById("selected-workout-description").textContent = "운동을 선택하면 해당 운동의 주동근과 보조근만 지도에 표시한다.";
+        document.getElementById("selected-workout-volume").textContent = `${workouts.length}종목 · ${totalSets(workouts)}세트`;
 
-      const overallButton = `
-        <button class="exercise-filter" type="button" data-exercise-index="all" aria-pressed="true">
-          <strong>최근 운동 전체</strong>
-          <small>최근 최대 3회 운동의 모든 자극 부위 합산</small>
-        </button>
-      `;
-      const exerciseButtons = latestMuscleRecord.workouts.map((workout, index) => `
-        <button class="exercise-filter" type="button" data-exercise-index="${index}" aria-pressed="false">
-          <strong>${escapeHtml(workout.name)}</strong>
-          <small>주동: ${escapeHtml(workout.primaryMuscles?.join(", ") || "미분류")} · 보조: ${escapeHtml(workout.secondaryMuscles?.join(", ") || "없음")}</small>
-        </button>
-      `).join("");
-      document.getElementById("exercise-filter-list").innerHTML = overallButton + exerciseButtons;
+        const scopeButton = `
+          <button class="exercise-filter" type="button" data-exercise-index="all" aria-pressed="true">
+            <strong>${escapeHtml(scopeLabel)} 전체 운동</strong>
+            <small>목록의 모든 운동과 자극 부위를 합산</small>
+          </button>
+        `;
+        const exerciseButtons = workouts.map((workout, index) => `
+          <button class="exercise-filter" type="button" data-exercise-index="${index}" aria-pressed="false">
+            <strong>${escapeHtml(workout.name)}</strong>
+            <small>${escapeHtml(workout.detail || `${workout.sets ?? 0}세트 × ${workout.reps ?? 10}회`)}</small>
+            <small>주동: ${escapeHtml(workout.primaryMuscles?.join(", ") || "미분류")} · 보조: ${escapeHtml(workout.secondaryMuscles?.join(", ") || "없음")}</small>
+          </button>
+        `).join("");
+        exerciseList.innerHTML = scopeButton + exerciseButtons;
 
-      document.querySelectorAll(".exercise-filter").forEach((button) => {
-        button.addEventListener("click", () => {
-          document.querySelectorAll(".exercise-filter").forEach((item) => item.setAttribute("aria-pressed", "false"));
-          button.setAttribute("aria-pressed", "true");
-          const index = button.dataset.exerciseIndex;
-          if (index === "all") {
-            renderMuscleMap(overallScores, "최근 운동 전체의 상체 분포");
-            return;
-          }
-          const workout = latestMuscleRecord.workouts[Number(index)];
-          renderMuscleMap(buildMuscleScores([workout]), workout.name);
+        exerciseList.querySelectorAll(".exercise-filter").forEach((button) => {
+          button.addEventListener("click", () => {
+            exerciseList.querySelectorAll(".exercise-filter").forEach((item) => item.setAttribute("aria-pressed", "false"));
+            button.setAttribute("aria-pressed", "true");
+            const index = button.dataset.exerciseIndex;
+            if (index === "all") {
+              renderMuscleMap(scores, `${scopeLabel} 상체 분포`);
+              return;
+            }
+            const workout = workouts[Number(index)];
+            renderMuscleMap(buildMuscleScores([workout]), workout.name);
+          });
         });
+      };
+
+      const selectMuscleDate = (dateKey) => {
+        document.querySelectorAll(".muscle-date-filter").forEach((button) => {
+          button.setAttribute("aria-pressed", String(button.dataset.date === dateKey));
+        });
+
+        if (dateKey === "recent") {
+          document.getElementById("muscle-map-date").textContent = `최근 ${recentMuscleRecords.length}회 · ${formatDate(latestMuscleRecord.date)} 기준`;
+          renderMuscleMap(overallScores, "최근 운동 전체의 상체 분포");
+          renderExerciseList(recentWorkouts, `최근 ${recentMuscleRecords.length}회`, overallScores);
+          return;
+        }
+
+        const record = recentMuscleRecords.find((item) => item.date === dateKey);
+        if (!record) return;
+        const dateLabel = formatDate(record.date);
+        const scores = buildMuscleScores(record.workouts);
+        document.getElementById("muscle-map-date").textContent = dateLabel;
+        renderMuscleMap(scores, `${dateLabel} 상체 분포`);
+        renderExerciseList(record.workouts, dateLabel, scores);
+      };
+
+      document.getElementById("muscle-date-list").innerHTML = `
+        <button class="muscle-date-filter" type="button" data-date="recent" aria-pressed="true">최근 ${recentMuscleRecords.length}회 전체</button>
+        ${recentMuscleRecords.map((record) => `
+          <button class="muscle-date-filter" type="button" data-date="${record.date}" aria-pressed="false">${escapeHtml(formatDate(record.date))}</button>
+        `).join("")}
+      `;
+      document.querySelectorAll(".muscle-date-filter").forEach((button) => {
+        button.addEventListener("click", () => selectMuscleDate(button.dataset.date));
       });
+      selectMuscleDate("recent");
     }
 
     const latestWorkoutDate = recordsWithWorkout[0]?.date;
