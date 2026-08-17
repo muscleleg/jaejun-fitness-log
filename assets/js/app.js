@@ -12,7 +12,7 @@ const healthRecords = window.healthRecordData.map((record) => ({
       return {
         ...workout,
         name: workout.exerciseId,
-        reps: workout.reps ?? defaultReps,
+        reps: workout.reps ?? (workout.repsBySet?.length ? null : defaultReps),
         primaryMuscles: [],
         secondaryMuscles: []
       };
@@ -20,7 +20,7 @@ const healthRecords = window.healthRecordData.map((record) => ({
     return {
       ...workout,
       name: exercise.name,
-      reps: workout.reps ?? defaultReps,
+      reps: workout.reps ?? (workout.repsBySet?.length ? null : defaultReps),
       primaryMuscles: exercise.primaryMuscles,
       secondaryMuscles: exercise.secondaryMuscles
     };
@@ -32,7 +32,8 @@ document.getElementById("profile-height").textContent = `${heightCm} cm`;
 document.getElementById("profile-birth-year").textContent = `${birthYear}년`;
 document.getElementById("profile-default-reps").textContent = `세트당 ${defaultReps}회`;
 document.getElementById("goal-statement").textContent = policy.goal.statement;
-document.getElementById("goal-focus").textContent = `우선 관찰: ${policy.goal.focusAreas.join(" · ")} · 운영: ${policy.goal.preferExistingExercises ? `익숙한 ${window.exerciseCatalog.length}종목 우선` : "필요에 따라 종목 조정"}`;
+const preferredExerciseCount = window.exerciseCatalog.filter((exercise) => exercise.preferred !== false).length;
+document.getElementById("goal-focus").textContent = `우선 관찰: ${policy.goal.focusAreas.join(" · ")} · 운영: ${policy.goal.preferExistingExercises ? `익숙한 ${preferredExerciseCount}종목 우선` : "필요에 따라 종목 조정"}`;
 document.getElementById("muscle-map-window-description").textContent = `최근 최대 ${policy.recentWorkoutCount}회의 주동근과 보조근을 앞·뒤 인체 도해에 연결한다.`;
 
 const dashboardViews = new Set(["home", "workout", "body", "nutrition", "data"]);
@@ -116,6 +117,10 @@ const formatDate = (date) => new Intl.DateTimeFormat("ko-KR", {
 
 const valueWithUnit = (value, unit = "kg") =>
   value === null || value === undefined || value === "" ? "—" : `${escapeHtml(value)} ${unit}`;
+
+const formatWorkoutReps = (workout) => workout.repsBySet?.length
+  ? workout.repsBySet.join("·")
+  : workout.reps ?? defaultReps;
 
 const metricDate = (record) => record
   ? `${new Intl.DateTimeFormat("ko-KR", { month: "long", day: "numeric" }).format(new Date(`${record.date}T00:00:00`))} 기록`
@@ -355,7 +360,7 @@ if (latestMuscleRecord) {
         <td class="exercise-cell" data-label="운동">${escapeHtml(workout.name)}</td>
         <td class="detail-cell" data-label="중량·수행">${escapeHtml(workout.detail || "상세 중량 미기록")}</td>
         <td class="number-cell" data-label="세트">${workout.sets ?? "—"}세트</td>
-        <td class="number-cell" data-label="횟수">${workout.reps ?? 10}회</td>
+        <td class="number-cell" data-label="횟수">${escapeHtml(formatWorkoutReps(workout))}회</td>
         <td class="muscle-cell" data-label="난이도·자세">${escapeHtml(workout.lastSetRir ?? workout.difficulty ?? workout.formStatus ?? "미기록")}</td>
       </tr>
     `).join("");
@@ -393,7 +398,7 @@ if (latestMuscleRecord) {
       ${displayEntries.map(({ workout }, index) => `
         <button class="exercise-filter" type="button" data-exercise-index="${index}" aria-pressed="false">
           <strong>${escapeHtml(workout.name)}</strong>
-          <small>${escapeHtml(workout.detail || `${workout.sets ?? 0}세트 × ${workout.reps ?? 10}회`)}</small>
+          <small>${escapeHtml(workout.detail || `${workout.sets ?? 0}세트 × ${formatWorkoutReps(workout)}회`)}</small>
           <small>주동: ${escapeHtml(workout.primaryMuscles?.join(", ") || "미분류")} · 보조: ${escapeHtml(workout.secondaryMuscles?.join(", ") || "없음")}</small>
         </button>
       `).join("")}
@@ -567,7 +572,10 @@ if (sortedRecords.length) {
     const feedbackContent = latestAdviceRecord.advice.points?.length
       ? `<ul class="feedback-points">${latestAdviceRecord.advice.points.map((point) => `<li><strong>${escapeHtml(point.label)}</strong>${escapeHtml(point.text)}</li>`).join("")}</ul>`
       : escapeHtml(latestAdviceRecord.advice.body ?? "");
-    document.getElementById("advice").innerHTML = `<strong class="feedback-title">${escapeHtml(latestAdviceRecord.advice.title)}</strong>${feedbackContent}`;
+    const feedbackSources = latestAdviceRecord.advice.sources?.length
+      ? `<div class="evidence-links">${renderSourceLinks(latestAdviceRecord.advice.sources)}</div>`
+      : "";
+    document.getElementById("advice").innerHTML = `<strong class="feedback-title">${escapeHtml(latestAdviceRecord.advice.title)}</strong>${feedbackContent}${feedbackSources}`;
   }
 
   if (latestActionRecord) {

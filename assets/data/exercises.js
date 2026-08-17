@@ -37,6 +37,20 @@ window.exerciseCatalog = Object.freeze([
     secondaryMuscles: ["측면 어깨", "삼두"]
   },
   {
+    id: "machine-shoulder-press",
+    name: "머신 숄더프레스",
+    primaryMuscles: ["전면 어깨"],
+    secondaryMuscles: ["측면 어깨", "삼두"],
+    preferred: false
+  },
+  {
+    id: "mid-cable-one-arm-lateral-raise",
+    name: "중간 높이 케이블 원암 레터럴 레이즈",
+    primaryMuscles: ["측면 어깨"],
+    secondaryMuscles: [],
+    preferred: false
+  },
+  {
     id: "machine-chest-press",
     name: "머신 체스트프레스",
     primaryMuscles: ["가슴"],
