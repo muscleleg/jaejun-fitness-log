@@ -986,7 +986,7 @@
       <div class="section-head">
         <div>
           <h2 id="composition-analysis-title">체성분 비율 분석</h2>
-          <p class="muted">측정된 kg·L 값을 체중 대비 비율로 바꾸고 참고 범위에서 현재 위치를 본다.</p>
+          <p class="muted">측정된 kg·L 값을 체중 대비 비율로 바꾸고 남성 참고 범위에서 현재 위치를 본다.</p>
         </div>
         <span class="tag blue" id="composition-analysis-date">측정 대기 중</span>
       </div>
@@ -1317,13 +1317,11 @@
       const bmiStatus = bmi < 18.5 ? "WHO 기준 저체중 구간" : bmi < 25 ? "WHO 기준 정상 체중 범위" : bmi < 30 ? "WHO 기준 과체중 구간" : "WHO 기준 비만 구간";
       const bodyFatStatus = bodyFatPercent === null
         ? "측정값 없음"
-        : bodyFatPercent >= 18 && bodyFatPercent <= 20
-          ? "남성·여성 참고 범위가 겹치는 구간"
-          : bodyFatPercent >= 10 && bodyFatPercent <= 20
+        : bodyFatPercent < 10
+          ? "InBody 남성 참고 범위보다 낮음"
+          : bodyFatPercent <= 20
             ? "InBody 남성 참고 범위 안"
-            : bodyFatPercent >= 18 && bodyFatPercent <= 28
-              ? "InBody 여성 참고 범위 안"
-              : "성별에 따른 참고 범위 확인 필요";
+            : "InBody 남성 참고 범위보다 높음";
       const waterStatus = bodyWaterPercent === null
         ? "측정값 없음"
         : bodyWaterPercent >= 50 && bodyWaterPercent <= 65
@@ -1345,9 +1343,8 @@
           <p class="composition-status">${escapeHtml(bodyFatStatus)}</p>
           ${bodyFatPercent === null ? "" : `<div class="reference-stack">
             ${renderReferenceBar({ label: "InBody 남성 참고", value: bodyFatPercent, scaleMin: 5, scaleMax: 35, rangeMin: 10, rangeMax: 20 })}
-            ${renderReferenceBar({ label: "InBody 여성 참고", value: bodyFatPercent, scaleMin: 5, scaleMax: 35, rangeMin: 18, rangeMax: 28 })}
           </div>`}
-          <p class="composition-detail">체지방량 ${valueWithUnit(body?.bodyFat)} ÷ 체중 ${weight.toFixed(1)}kg. 성별이 기록되지 않아 두 참고 범위를 함께 표시한다.</p>
+          <p class="composition-detail">체지방량 ${valueWithUnit(body?.bodyFat)} ÷ 체중 ${weight.toFixed(1)}kg. 남성용 InBody 참고 범위 10–20%와 비교한다.</p>
         </article>
         <article class="composition-card">
           <div class="composition-card-head"><h3>체수분률</h3><span class="composition-value">${bodyWaterPercent === null ? "—" : `${bodyWaterPercent.toFixed(1)}%`}</span></div>
