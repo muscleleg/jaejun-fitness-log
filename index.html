@@ -102,7 +102,7 @@
     .hero {
       position: relative;
       overflow: hidden;
-      padding: clamp(28px, 4.5vw, 52px);
+      padding: clamp(24px, 3.5vw, 38px);
       border: 1px solid rgba(255, 255, 255, 0.75);
       border-radius: 34px;
       background: linear-gradient(135deg, #163f35 0%, #195a49 58%, #1b5d73 100%);
@@ -137,9 +137,9 @@
 
     h1 {
       max-width: 760px;
-      margin: 18px 0 16px;
-      font-size: clamp(2.25rem, 5vw, 4.1rem);
-      line-height: 1.05;
+      margin: 14px 0 12px;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      line-height: 1.1;
       letter-spacing: -0.055em;
     }
 
@@ -188,6 +188,23 @@
       gap: 12px;
       margin-top: 22px;
     }
+
+    .hero-profile {
+      position: relative;
+      z-index: 1;
+      margin-top: 18px;
+      border-top: 1px solid rgba(255, 255, 255, 0.14);
+    }
+
+    .hero-profile summary {
+      padding-top: 14px;
+      color: rgba(255, 255, 255, 0.76);
+      font-size: 0.86rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .hero-profile .stats { margin-top: 12px; }
 
     .stat {
       padding: 14px 16px;
@@ -792,6 +809,35 @@
 
     .composition-note strong { color: var(--blue); }
 
+    .source-disclosure {
+      margin-top: 14px;
+      border: 1px solid #c9dcec;
+      border-radius: 15px;
+      background: var(--blue-soft);
+    }
+
+    .source-disclosure summary {
+      padding: 13px 16px;
+      color: var(--blue);
+      font-size: 0.84rem;
+      font-weight: 850;
+      cursor: pointer;
+    }
+
+    .source-disclosure .composition-note {
+      margin: 0;
+      border: 0;
+      border-top: 1px solid #c9dcec;
+      border-radius: 0;
+    }
+
+    .source-disclosure .evidence-links { padding: 0 16px 15px; }
+
+    .nutrition-focus { margin-top: 14px; }
+    .nutrition-focus .muted { display: block; margin-top: 8px; }
+
+    .data-link { color: var(--blue); font-weight: 800; }
+
     .empty {
       padding: 34px;
       border: 1px dashed #b9c8cb;
@@ -1185,14 +1231,14 @@
 
     <nav class="app-tabs" aria-label="헬스 기록 화면">
       <a class="app-tab" href="index.html?view=home" data-dashboard-tab="home" aria-current="page">홈</a>
-      <a class="app-tab" href="index.html?view=records" data-dashboard-tab="records">기록</a>
-      <a class="app-tab" href="index.html?view=analysis" data-dashboard-tab="analysis">분석</a>
-      <a class="app-tab" href="index.html?view=routine" data-dashboard-tab="routine">루틴</a>
+      <a class="app-tab" href="index.html?view=workout" data-dashboard-tab="workout">운동</a>
+      <a class="app-tab" href="index.html?view=body" data-dashboard-tab="body">신체</a>
+      <a class="app-tab" href="index.html?view=nutrition" data-dashboard-tab="nutrition">식사</a>
     </nav>
 
-    <header class="hero" data-dashboard-panel="home">
+    <header class="hero" data-dashboard-panel="home" data-dashboard-order="1">
       <span class="eyebrow">Upper body project</span>
-      <h1>옷 위로도 드러나는<br>좋은 상체 만들기</h1>
+      <h1>좋은 상체를 위한 코칭 기록</h1>
       <p class="summary">기록을 모으는 데서 끝내지 않고, 매번 다음 운동과 식사에서 바꿀 행동을 결정한다.</p>
       <div class="hero-goal">
         <strong>목표</strong>
@@ -1201,15 +1247,18 @@
           <small id="goal-focus"></small>
         </div>
       </div>
-      <div class="stats" aria-label="고정 프로필">
-        <div class="stat">키<strong id="profile-height"></strong></div>
-        <div class="stat">출생연도<strong id="profile-birth-year"></strong></div>
-        <div class="stat">연 나이<strong><span id="age">계산 중</span>세</strong></div>
-        <div class="stat">기본 반복 수<strong id="profile-default-reps"></strong></div>
-      </div>
+      <details class="hero-profile">
+        <summary>프로필 기준 보기</summary>
+        <div class="stats" aria-label="고정 프로필">
+          <div class="stat">키<strong id="profile-height"></strong></div>
+          <div class="stat">출생연도<strong id="profile-birth-year"></strong></div>
+          <div class="stat">연 나이<strong><span id="age">계산 중</span>세</strong></div>
+          <div class="stat">기본 반복 수<strong id="profile-default-reps"></strong></div>
+        </div>
+      </details>
     </header>
 
-    <section class="priority-section" data-dashboard-panel="home" aria-labelledby="advice-title">
+    <section class="priority-section" data-dashboard-panel="home" data-dashboard-order="2" aria-labelledby="advice-title">
       <div class="coach-grid">
         <article class="feedback-card">
           <span class="tag">Coach feedback</span>
@@ -1229,7 +1278,7 @@
       </div>
     </section>
 
-    <section data-dashboard-panel="home" aria-labelledby="status-title">
+    <section data-dashboard-panel="home" data-dashboard-order="3" aria-labelledby="status-title">
       <div class="section-head">
         <div>
           <h2 id="status-title">최근 기록 한눈에 보기</h2>
@@ -1251,7 +1300,7 @@
       </div>
     </section>
 
-    <section data-dashboard-panel="analysis" aria-labelledby="composition-analysis-title">
+    <section data-dashboard-panel="body" data-dashboard-order="1" aria-labelledby="composition-analysis-title">
       <div class="section-head">
         <div>
           <h2 id="composition-analysis-title">체성분 비율 분석</h2>
@@ -1266,11 +1315,14 @@
       <div class="composition-grid" id="composition-analysis">
         <div class="empty">체성분 측정값이 들어오면 비율과 참고 범위를 계산합니다.</div>
       </div>
-      <div class="composition-note" id="composition-note"></div>
-      <div class="evidence-links" id="composition-evidence-links" aria-label="체성분 분석 기준 출처"></div>
+      <details class="source-disclosure">
+        <summary>분석 기준과 해석 주의 보기</summary>
+        <div class="composition-note" id="composition-note"></div>
+        <div class="evidence-links" id="composition-evidence-links" aria-label="체성분 분석 기준 출처"></div>
+      </details>
     </section>
 
-    <section data-dashboard-panel="analysis" aria-labelledby="muscle-map-title">
+    <section data-dashboard-panel="workout" data-dashboard-order="3" aria-labelledby="muscle-map-title">
       <div class="section-head">
         <div>
           <h2 id="muscle-map-title">최근 운동 자극 지도</h2>
@@ -1339,7 +1391,7 @@
       </div>
     </section>
 
-    <section data-dashboard-panel="routine" aria-labelledby="routine-policy-title">
+    <section data-dashboard-panel="workout" data-dashboard-order="2" aria-labelledby="routine-policy-title">
       <div class="section-head">
         <div>
           <h2 id="routine-policy-title">고정 상체 루틴 운영 원칙</h2>
@@ -1375,7 +1427,7 @@
       <div class="progression-rule" id="progression-rule"></div>
     </section>
 
-    <section data-dashboard-panel="records" aria-labelledby="calendar-section-title">
+    <section data-dashboard-panel="workout" data-dashboard-order="1" aria-labelledby="calendar-section-title">
       <div class="section-head">
         <div>
           <h2 id="calendar-section-title">운동 캘린더</h2>
@@ -1399,7 +1451,7 @@
       </div>
     </section>
 
-    <section data-dashboard-panel="records" aria-labelledby="body-history-title">
+    <section data-dashboard-panel="body" data-dashboard-order="2" aria-labelledby="body-history-title">
       <div class="section-head">
         <div>
           <h2 id="body-history-title">체성분 누적 변화</h2>
@@ -1428,62 +1480,82 @@
       <div class="empty" id="body-history-empty">아직 저장된 체성분 측정값이 없습니다.</div>
     </section>
 
-    <section data-dashboard-panel="records" aria-labelledby="records-title">
+    <section data-dashboard-panel="nutrition" data-dashboard-order="1" aria-labelledby="nutrition-overview-title">
       <div class="section-head">
         <div>
-          <h2 id="records-title">상세 기록 보관함</h2>
-          <p class="muted">필요할 때 펼쳐 운동, 식사와 날짜별 원본 기록을 확인한다.</p>
+          <h2 id="nutrition-overview-title">최근 식사 요약</h2>
+          <p class="muted">최근 기록의 섭취 추정치와 가장 먼저 보완할 점을 확인한다.</p>
+        </div>
+        <span class="tag blue" id="nutrition-overview-date">기록 대기 중</span>
+      </div>
+      <div class="session-summary" id="nutrition-overview-metrics">
+        <div class="metric"><span>추정 섭취 열량</span><strong>—</strong></div>
+        <div class="metric"><span>추정 단백질</span><strong>—</strong></div>
+        <div class="metric"><span>기록된 끼니</span><strong>—</strong></div>
+      </div>
+      <div class="callout nutrition-focus" id="nutrition-focus">식사 기록이 들어오면 목표 대비 가장 중요한 보완점을 표시합니다.</div>
+    </section>
+
+    <section data-dashboard-panel="workout" data-dashboard-order="4" aria-labelledby="workout-archive-title">
+      <div class="section-head">
+        <div>
+          <h2 id="workout-archive-title">운동 수행 기록</h2>
+          <p class="muted">날짜별로 실제 수행한 종목과 중량을 확인한다.</p>
         </div>
       </div>
-      <div class="archive-list">
-        <details class="archive" open>
-          <summary id="workout-title">운동 누적 기록</summary>
-          <div class="archive-content">
-            <div class="record-list" id="workout-list">
-              <div class="empty">아직 저장된 운동 기록이 없습니다.</div>
-            </div>
-          </div>
-        </details>
-        <details class="archive">
-          <summary id="nutrition-title">식사·영양 누적 기록</summary>
-          <div class="archive-content">
-            <div class="record-list" id="nutrition-list">
-              <div class="empty">아직 저장된 식사 기록이 없습니다. 정확한 무게를 모르면 한 공기, 한 팩처럼 알려줘도 됩니다.</div>
-            </div>
-          </div>
-        </details>
-        <details class="archive">
-          <summary id="history-title">날짜별 통합 원본</summary>
-          <div class="archive-content">
-            <div class="record-list" id="record-list">
-              <div class="empty">아직 저장된 운동·식사 기록이 없습니다.</div>
-            </div>
-          </div>
-        </details>
+      <div class="record-list" id="workout-list">
+        <div class="empty">아직 저장된 운동 기록이 없습니다.</div>
       </div>
     </section>
 
-    <section data-dashboard-panel="routine" aria-labelledby="rules-title">
+    <section data-dashboard-panel="nutrition" data-dashboard-order="2" aria-labelledby="nutrition-archive-title">
       <div class="section-head">
         <div>
-          <h2 id="rules-title">기록을 해석하는 원칙</h2>
+          <h2 id="nutrition-archive-title">날짜별 식사 기록</h2>
+          <p class="muted">기록한 음식과 당시 사용한 추정 범위·가정을 함께 보존한다.</p>
         </div>
       </div>
-      <div class="grid">
-        <article class="card">
-          <span class="tag">체성분</span>
-          <h3>가능하면 비슷한 조건에서</h3>
-          <p class="muted">측정 시간, 수분 섭취, 식사와 운동 여부에 따라 수치가 흔들릴 수 있다. 한 번의 증감보다 여러 기록의 방향을 본다.</p>
-        </article>
-        <article class="card">
-          <span class="tag blue">훈련</span>
-          <h3>수행의 발전을 함께 확인</h3>
-          <p class="muted">운동 이름뿐 아니라 중량, 횟수, 세트와 체감 난도가 있을수록 정체와 회복 상태를 더 정확히 판단할 수 있다.</p>
-        </article>
+      <div class="record-list" id="nutrition-list">
+        <div class="empty">아직 저장된 식사 기록이 없습니다. 정확한 무게를 모르면 한 공기, 한 팩처럼 알려줘도 됩니다.</div>
       </div>
     </section>
 
-    <footer class="footer">개인 헬스 기록 · 실제 기록에 근거해 계속 갱신합니다.</footer>
+    <section data-dashboard-panel="data" data-dashboard-order="1" aria-labelledby="history-title">
+      <div class="section-head">
+        <div>
+          <h2 id="history-title">전체 원본 데이터</h2>
+          <p class="muted">운동·식사·체성분을 날짜별 통합 기록으로 확인한다.</p>
+        </div>
+      </div>
+      <div class="record-list" id="record-list">
+        <div class="empty">아직 저장된 운동·식사 기록이 없습니다.</div>
+      </div>
+    </section>
+
+    <section data-dashboard-panel="workout" data-dashboard-order="5" aria-labelledby="rules-title">
+      <details class="archive">
+        <summary id="rules-title">기록을 해석하는 원칙</summary>
+        <div class="archive-content">
+          <div class="grid">
+            <article class="card">
+              <span class="tag">체성분</span>
+              <h3>가능하면 비슷한 조건에서</h3>
+              <p class="muted">측정 시간, 수분 섭취, 식사와 운동 여부에 따라 수치가 흔들릴 수 있다. 한 번의 증감보다 여러 기록의 방향을 본다.</p>
+            </article>
+            <article class="card">
+              <span class="tag blue">훈련</span>
+              <h3>수행의 발전을 함께 확인</h3>
+              <p class="muted">운동 이름뿐 아니라 중량, 횟수, 세트와 체감 난도가 있을수록 정체와 회복 상태를 더 정확히 판단할 수 있다.</p>
+            </article>
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <footer class="footer">
+      개인 헬스 기록 · 실제 기록에 근거해 계속 갱신합니다. ·
+      <a class="data-link" href="index.html?view=data">전체 데이터 보기</a>
+    </footer>
   </main>
 
   <script src="assets/data/profile.js"></script>

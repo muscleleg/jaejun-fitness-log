@@ -35,14 +35,29 @@ document.getElementById("goal-statement").textContent = policy.goal.statement;
 document.getElementById("goal-focus").textContent = `우선 관찰: ${policy.goal.focusAreas.join(" · ")} · 운영: ${policy.goal.preferExistingExercises ? `익숙한 ${window.exerciseCatalog.length}종목 우선` : "필요에 따라 종목 조정"}`;
 document.getElementById("muscle-map-window-description").textContent = `최근 최대 ${policy.recentWorkoutCount}회의 주동근과 보조근을 앞·뒤 인체 도해에 연결한다.`;
 
-const dashboardTabs = new Set(["home", "records", "analysis", "routine"]);
+const dashboardViews = new Set(["home", "workout", "body", "nutrition", "data"]);
+const dashboardAliases = {
+  records: "workout",
+  analysis: "body",
+  routine: "workout"
+};
 const dashboardTabButtons = [...document.querySelectorAll("[data-dashboard-tab]")];
 const dashboardPanels = [...document.querySelectorAll("[data-dashboard-panel]")];
 const requestedDashboardView = new URLSearchParams(window.location.search).get("view");
 const legacyDashboardView = window.location.hash.slice(1);
-const activeDashboardView = dashboardTabs.has(requestedDashboardView)
-  ? requestedDashboardView
-  : dashboardTabs.has(legacyDashboardView) ? legacyDashboardView : "home";
+const normalizeDashboardView = (view) => dashboardAliases[view] ?? view;
+const normalizedRequestedView = normalizeDashboardView(requestedDashboardView);
+const normalizedLegacyView = normalizeDashboardView(legacyDashboardView);
+const activeDashboardView = dashboardViews.has(normalizedRequestedView)
+  ? normalizedRequestedView
+  : dashboardViews.has(normalizedLegacyView) ? normalizedLegacyView : "home";
+const dashboardTitles = {
+  home: "홈",
+  workout: "운동",
+  body: "신체",
+  nutrition: "식사",
+  data: "전체 데이터"
+};
 
 dashboardTabButtons.forEach((link) => {
   if (link.dataset.dashboardTab === activeDashboardView) {
@@ -54,6 +69,12 @@ dashboardTabButtons.forEach((link) => {
 dashboardPanels.forEach((panel) => {
   panel.hidden = panel.dataset.dashboardPanel !== activeDashboardView;
 });
+const dashboardFooter = document.querySelector(".footer");
+dashboardPanels
+  .filter((panel) => panel.dataset.dashboardPanel === activeDashboardView)
+  .sort((a, b) => Number(a.dataset.dashboardOrder) - Number(b.dataset.dashboardOrder))
+  .forEach((panel) => dashboardFooter.before(panel));
+document.title = `${dashboardTitles[activeDashboardView]} · 상체 만들기 기록`;
 
 muscleMap.zones.forEach((zone) => {
   const element = document.querySelector(`.muscle-zone.${zone.className}`);
@@ -243,6 +264,23 @@ const sortedRecords = [...healthRecords].sort((a, b) => b.date.localeCompare(a.d
 const recordsWithBody = sortedRecords.filter((record) => record.body && Object.values(record.body).some((value) => value !== null && value !== undefined && value !== ""));
 const recordsWithWorkout = sortedRecords.filter((record) => record.workouts?.length);
 const recordsWithMeals = sortedRecords.filter((record) => record.meals?.length);
+
+const latestMealRecord = recordsWithMeals[0];
+if (latestMealRecord) {
+  const estimate = latestMealRecord.nutritionEstimate;
+  const nutritionPoint = latestMealRecord.advice?.points?.find((point) => point.label === "영양");
+  document.getElementById("nutrition-overview-date").textContent = formatDate(latestMealRecord.date);
+  document.getElementById("nutrition-overview-metrics").innerHTML = `
+    <div class="metric"><span>추정 섭취 열량</span><strong>${estimate ? escapeHtml(estimate.calories) : "—"}</strong></div>
+    <div class="metric"><span>추정 단백질</span><strong>${estimate ? escapeHtml(estimate.protein) : "—"}</strong></div>
+    <div class="metric"><span>기록된 식사 구분</span><strong>${latestMealRecord.meals.length}개</strong></div>
+  `;
+  document.getElementById("nutrition-focus").innerHTML = `
+    <strong class="feedback-title">가장 먼저 볼 점</strong>
+    ${escapeHtml(nutritionPoint?.text ?? "식사량과 단백질 추정치를 다음 기록과 비교합니다.")}
+    ${estimate?.target ? `<span class="muted">${escapeHtml(estimate.target)}</span>` : ""}
+  `;
+}
 
 const recentMuscleRecords = recordsWithWorkout.slice(0, policy.recentWorkoutCount);
 const latestMuscleRecord = recentMuscleRecords[0];
