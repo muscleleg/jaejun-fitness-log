@@ -117,6 +117,10 @@ const formatDate = (date) => new Intl.DateTimeFormat("ko-KR", {
 const valueWithUnit = (value, unit = "kg") =>
   value === null || value === undefined || value === "" ? "—" : `${escapeHtml(value)} ${unit}`;
 
+const metricDate = (record) => record
+  ? `${new Intl.DateTimeFormat("ko-KR", { month: "long", day: "numeric" }).format(new Date(`${record.date}T00:00:00`))} 기록`
+  : "기록 없음";
+
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 
 const renderReferenceBar = ({ label, value, scaleMin, scaleMax, rangeMin, rangeMax }) => {
@@ -522,42 +526,52 @@ document.getElementById("workout-days").textContent = `${recordsWithWorkout.leng
 document.getElementById("meal-days").textContent = `${recordsWithMeals.length}일`;
 
 if (sortedRecords.length) {
-  const latest = sortedRecords[0];
-  const latestWorkout = latest.workouts?.length ? `${latest.workouts.length}종목` : "—";
-  const totalSets = latest.workouts?.reduce((sum, workout) => sum + (workout.sets ?? 0), 0) ?? 0;
-  const latestWeight = Number(latest.body?.weight);
-  const recentMeasuredWeight = Number(recordsWithBody[0]?.body?.weight);
-  const proteinReferenceWeight = Number.isFinite(latestWeight) ? latestWeight : recentMeasuredWeight;
+  const hasBodyValue = (record, key) => record.body?.[key] !== null
+    && record.body?.[key] !== undefined
+    && record.body?.[key] !== "";
+  const latestBodyMetricRecords = {
+    weight: sortedRecords.find((record) => hasBodyValue(record, "weight")),
+    skeletalMuscle: sortedRecords.find((record) => hasBodyValue(record, "skeletalMuscle")),
+    bodyFat: sortedRecords.find((record) => hasBodyValue(record, "bodyFat")),
+    bodyWater: sortedRecords.find((record) => hasBodyValue(record, "bodyWater"))
+  };
+  const latestWorkoutRecord = recordsWithWorkout[0];
+  const latestNutritionRecord = sortedRecords.find((record) => record.nutritionEstimate);
+  const latestAdviceRecord = sortedRecords.find((record) => record.advice);
+  const latestActionRecord = sortedRecords.find((record) => record.actions?.length);
+  const latestWorkout = latestWorkoutRecord ? `${latestWorkoutRecord.workouts.length}종목` : "—";
+  const totalSets = latestWorkoutRecord?.workouts.reduce((sum, workout) => sum + (workout.sets ?? 0), 0) ?? 0;
+  const proteinReferenceWeight = Number(latestBodyMetricRecords.weight?.body?.weight);
   const proteinTarget = Number.isFinite(proteinReferenceWeight)
-    ? `약 ${Math.round(proteinReferenceWeight * policy.nutrition.proteinTargetPerKg)}g${Number.isFinite(latestWeight) ? "" : " (최근 체중 기준)"}`
+    ? `약 ${Math.round(proteinReferenceWeight * policy.nutrition.proteinTargetPerKg)}g (최근 체중 기준)`
     : "체중 기록 필요";
 
-  document.getElementById("latest-date").textContent = formatDate(latest.date);
+  document.getElementById("latest-date").textContent = "항목별 최신 기록";
   document.getElementById("latest-metrics").innerHTML = `
-    <div class="metric"><span>몸무게</span><strong>${valueWithUnit(latest.body?.weight)}</strong></div>
-    <div class="metric"><span>골격근량</span><strong>${valueWithUnit(latest.body?.skeletalMuscle)}</strong></div>
-    <div class="metric"><span>체지방량</span><strong>${valueWithUnit(latest.body?.bodyFat)}</strong></div>
-    <div class="metric"><span>체수분</span><strong>${valueWithUnit(latest.body?.bodyWater, "L")}</strong></div>
-    <div class="metric"><span>최근 운동</span><strong>${escapeHtml(latestWorkout)}</strong></div>
+    <div class="metric"><span>몸무게</span><strong>${valueWithUnit(latestBodyMetricRecords.weight?.body?.weight)}</strong><time class="metric-date">${metricDate(latestBodyMetricRecords.weight)}</time></div>
+    <div class="metric"><span>골격근량</span><strong>${valueWithUnit(latestBodyMetricRecords.skeletalMuscle?.body?.skeletalMuscle)}</strong><time class="metric-date">${metricDate(latestBodyMetricRecords.skeletalMuscle)}</time></div>
+    <div class="metric"><span>체지방량</span><strong>${valueWithUnit(latestBodyMetricRecords.bodyFat?.body?.bodyFat)}</strong><time class="metric-date">${metricDate(latestBodyMetricRecords.bodyFat)}</time></div>
+    <div class="metric"><span>체수분</span><strong>${valueWithUnit(latestBodyMetricRecords.bodyWater?.body?.bodyWater, "L")}</strong><time class="metric-date">${metricDate(latestBodyMetricRecords.bodyWater)}</time></div>
+    <div class="metric"><span>최근 운동</span><strong>${escapeHtml(latestWorkout)}</strong><time class="metric-date">${metricDate(latestWorkoutRecord)}</time></div>
   `;
 
   document.getElementById("session-summary").innerHTML = `
-    <div class="metric"><span>운동량</span><strong>${latest.workouts?.length ? `${latest.workouts.length}종목 · ${totalSets}세트` : "—"}</strong></div>
-    <div class="metric"><span>추정 섭취 열량</span><strong>${latest.nutritionEstimate ? escapeHtml(latest.nutritionEstimate.calories) : "—"}</strong></div>
-    <div class="metric"><span>추정 단백질</span><strong>${latest.nutritionEstimate ? `${escapeHtml(latest.nutritionEstimate.protein)} / 목표 ${escapeHtml(proteinTarget)}` : "—"}</strong></div>
+    <div class="metric"><span>운동량</span><strong>${latestWorkoutRecord ? `${latestWorkoutRecord.workouts.length}종목 · ${totalSets}세트` : "—"}</strong><time class="metric-date">${metricDate(latestWorkoutRecord)}</time></div>
+    <div class="metric"><span>추정 섭취 열량</span><strong>${latestNutritionRecord ? escapeHtml(latestNutritionRecord.nutritionEstimate.calories) : "—"}</strong><time class="metric-date">${metricDate(latestNutritionRecord)}</time></div>
+    <div class="metric"><span>추정 단백질</span><strong>${latestNutritionRecord ? `${escapeHtml(latestNutritionRecord.nutritionEstimate.protein)} / 목표 ${escapeHtml(proteinTarget)}` : "—"}</strong><time class="metric-date">${metricDate(latestNutritionRecord)}</time></div>
   `;
 
-  renderCompositionAnalysis(recordsWithBody[0]);
+  renderCompositionAnalysis(latestBodyMetricRecords.weight);
 
-  if (latest.advice) {
-    const feedbackContent = latest.advice.points?.length
-      ? `<ul class="feedback-points">${latest.advice.points.map((point) => `<li><strong>${escapeHtml(point.label)}</strong>${escapeHtml(point.text)}</li>`).join("")}</ul>`
-      : escapeHtml(latest.advice.body ?? "");
-    document.getElementById("advice").innerHTML = `<strong class="feedback-title">${escapeHtml(latest.advice.title)}</strong>${feedbackContent}`;
+  if (latestAdviceRecord?.advice) {
+    const feedbackContent = latestAdviceRecord.advice.points?.length
+      ? `<ul class="feedback-points">${latestAdviceRecord.advice.points.map((point) => `<li><strong>${escapeHtml(point.label)}</strong>${escapeHtml(point.text)}</li>`).join("")}</ul>`
+      : escapeHtml(latestAdviceRecord.advice.body ?? "");
+    document.getElementById("advice").innerHTML = `<strong class="feedback-title">${escapeHtml(latestAdviceRecord.advice.title)}</strong>${feedbackContent}`;
   }
 
-  if (latest.actions?.length) {
-    document.getElementById("next-actions").innerHTML = latest.actions
+  if (latestActionRecord) {
+    document.getElementById("next-actions").innerHTML = latestActionRecord.actions
       .map((action) => `<li>${escapeHtml(action)}</li>`)
       .join("");
   }

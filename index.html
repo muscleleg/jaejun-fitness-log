@@ -692,6 +692,14 @@
 
     .metric strong { font-size: 1.35rem; }
 
+    .metric .metric-date {
+      display: block;
+      margin-top: 7px;
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 750;
+    }
+
     .composition-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1282,7 +1290,7 @@
       <div class="section-head">
         <div>
           <h2 id="status-title">최근 기록 한눈에 보기</h2>
-          <p class="muted">가장 최근 날짜의 몸 상태, 운동량과 섭취 추정치를 함께 본다.</p>
+          <p class="muted">체성분·운동·식사마다 실제 데이터가 있는 가장 최근 기록을 함께 본다.</p>
         </div>
         <span class="tag" id="latest-date">첫 기록 대기 중</span>
       </div>
