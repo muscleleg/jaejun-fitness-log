@@ -22,6 +22,15 @@ window.coachingPolicy = Object.freeze({
     ]
   },
   nutrition: {
-    proteinTargetPerKg: 1.6
+    proteinTargetPerKg: 1.6,
+    freeSugar: {
+      maximumEnergyRatio: 0.1,
+      idealEnergyRatio: 0.05,
+      referenceCalories: 2000,
+      caloriesPerGram: 4,
+      sources: [
+        { label: "WHO 성인·어린이 유리당 섭취 지침", href: "https://www.who.int/publications/i/item/WHO-NMH-NHD-15.3" }
+      ]
+    }
   }
 });

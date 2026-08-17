@@ -2,6 +2,9 @@ const { birthYear, heightCm, defaultReps } = window.fitnessProfile;
 const compositionStandards = window.bodyCompositionStandards;
 const policy = window.coachingPolicy;
 const muscleMap = window.muscleMapConfig;
+const freeSugarPolicy = policy.nutrition.freeSugar;
+const freeSugarReferenceMax = Math.round(freeSugarPolicy.referenceCalories * freeSugarPolicy.maximumEnergyRatio / freeSugarPolicy.caloriesPerGram);
+const freeSugarReferenceIdeal = Math.round(freeSugarPolicy.referenceCalories * freeSugarPolicy.idealEnergyRatio / freeSugarPolicy.caloriesPerGram);
 const exercisesById = new Map(window.exerciseCatalog.map((exercise) => [exercise.id, exercise]));
 const healthRecords = window.healthRecordData.map((record) => ({
   ...record,
@@ -262,9 +265,12 @@ const renderNutritionEstimate = (estimate) => estimate ? `
     <div class="estimate-values">
       <span>추정 열량 ${escapeHtml(estimate.calories)}</span>
       <span>추정 단백질 ${escapeHtml(estimate.protein)}</span>
+      ${estimate.freeSugar ? `<span>추정 유리당 ${escapeHtml(estimate.freeSugar)}</span>` : ""}
     </div>
     <small><strong>가정:</strong> ${escapeHtml(estimate.assumptions)}</small>
     <small><strong>판단 기준:</strong> ${escapeHtml(estimate.target)}</small>
+    ${estimate.freeSugar ? `<small><strong>유리당 기준:</strong> WHO 권고는 하루 에너지의 10% 미만, 가능하면 5% 미만이다. ${freeSugarPolicy.referenceCalories.toLocaleString("ko-KR")}kcal 기준 각각 ${freeSugarReferenceMax}g·${freeSugarReferenceIdeal}g 미만이다.</small>` : ""}
+    ${estimate.freeSugar ? `<div class="estimate-sources">${renderSourceLinks(freeSugarPolicy.sources)}</div>` : ""}
     ${estimate.sources?.length ? `<div class="estimate-sources">${estimate.sources.map((source) => `<a href="${escapeHtml(source.href)}" target="_blank" rel="noopener noreferrer">${escapeHtml(source.label)}</a>`).join("")}</div>` : ""}
   </div>
 ` : "";
@@ -278,16 +284,19 @@ const latestMealRecord = recordsWithMeals[0];
 if (latestMealRecord) {
   const estimate = latestMealRecord.nutritionEstimate;
   const nutritionPoint = latestMealRecord.advice?.points?.find((point) => point.label === "영양");
+  const sugarPoint = latestMealRecord.advice?.points?.find((point) => point.label === "유리당");
   document.getElementById("nutrition-overview-date").textContent = formatDate(latestMealRecord.date);
   document.getElementById("nutrition-overview-metrics").innerHTML = `
     <div class="metric"><span>추정 섭취 열량</span><strong>${estimate ? escapeHtml(estimate.calories) : "—"}</strong></div>
     <div class="metric"><span>추정 단백질</span><strong>${estimate ? escapeHtml(estimate.protein) : "—"}</strong></div>
-    <div class="metric"><span>기록된 식사 구분</span><strong>${latestMealRecord.meals.length}개</strong></div>
+    <div class="metric"><span>추정 유리당</span><strong>${estimate?.freeSugar ? escapeHtml(estimate.freeSugar) : "—"}</strong></div>
   `;
   document.getElementById("nutrition-focus").innerHTML = `
     <strong class="feedback-title">가장 먼저 볼 점</strong>
     ${escapeHtml(nutritionPoint?.text ?? "식사량과 단백질 추정치를 다음 기록과 비교합니다.")}
+    ${sugarPoint ? `<span class="nutrition-focus-point">${escapeHtml(sugarPoint.text)}</span>` : ""}
     ${estimate?.target ? `<span class="muted">${escapeHtml(estimate.target)}</span>` : ""}
+    ${estimate?.freeSugar ? `<div class="evidence-links">${renderSourceLinks(freeSugarPolicy.sources)}</div>` : ""}
   `;
 }
 
