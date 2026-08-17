@@ -38,36 +38,22 @@ document.getElementById("muscle-map-window-description").textContent = `최근 �
 const dashboardTabs = new Set(["home", "records", "analysis", "routine"]);
 const dashboardTabButtons = [...document.querySelectorAll("[data-dashboard-tab]")];
 const dashboardPanels = [...document.querySelectorAll("[data-dashboard-panel]")];
+const requestedDashboardView = new URLSearchParams(window.location.search).get("view");
+const legacyDashboardView = window.location.hash.slice(1);
+const activeDashboardView = dashboardTabs.has(requestedDashboardView)
+  ? requestedDashboardView
+  : dashboardTabs.has(legacyDashboardView) ? legacyDashboardView : "home";
 
-const selectDashboardTab = (tabId, { updateHash = true, scroll = false } = {}) => {
-  const selectedTab = dashboardTabs.has(tabId) ? tabId : "home";
-
-  dashboardTabButtons.forEach((button) => {
-    button.setAttribute("aria-pressed", String(button.dataset.dashboardTab === selectedTab));
-  });
-  dashboardPanels.forEach((panel) => {
-    panel.hidden = panel.dataset.dashboardPanel !== selectedTab;
-  });
-
-  if (updateHash) history.replaceState(null, "", `#${selectedTab}`);
-
-  if (scroll) {
-    const firstPanel = dashboardPanels.find((panel) => panel.dataset.dashboardPanel === selectedTab);
-    firstPanel?.scrollIntoView({ behavior: "smooth", block: "start" });
+dashboardTabButtons.forEach((link) => {
+  if (link.dataset.dashboardTab === activeDashboardView) {
+    link.setAttribute("aria-current", "page");
+  } else {
+    link.removeAttribute("aria-current");
   }
-};
-
-dashboardTabButtons.forEach((button) => {
-  button.addEventListener("click", () => {
-    selectDashboardTab(button.dataset.dashboardTab, { scroll: true });
-  });
 });
-
-window.addEventListener("hashchange", () => {
-  selectDashboardTab(window.location.hash.slice(1), { updateHash: false, scroll: true });
+dashboardPanels.forEach((panel) => {
+  panel.hidden = panel.dataset.dashboardPanel !== activeDashboardView;
 });
-
-selectDashboardTab(window.location.hash.slice(1), { updateHash: false });
 
 muscleMap.zones.forEach((zone) => {
   const element = document.querySelector(`.muscle-zone.${zone.className}`);

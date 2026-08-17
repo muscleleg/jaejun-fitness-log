@@ -67,6 +67,7 @@
     }
 
     .app-tab {
+      display: block;
       min-width: 0;
       padding: 11px 14px;
       border: 0;
@@ -75,6 +76,8 @@
       color: var(--muted);
       font: inherit;
       font-weight: 850;
+      text-align: center;
+      text-decoration: none;
       cursor: pointer;
       transition: background 160ms ease, color 160ms ease, transform 160ms ease;
     }
@@ -86,13 +89,15 @@
       outline: 3px solid rgba(24, 121, 78, 0.10);
     }
 
-    .app-tab[aria-pressed="true"] {
+    .app-tab[aria-current="page"] {
       color: #fff;
       background: var(--green);
       box-shadow: 0 6px 16px rgba(24, 121, 78, 0.22);
     }
 
     [data-dashboard-panel][hidden] { display: none; }
+
+    .app-tabs + .hero { margin-top: 18px; }
 
     .hero {
       position: relative;
@@ -1178,7 +1183,14 @@
   <main class="wrap">
     <nav class="breadcrumb" aria-label="문서 경로"><span aria-current="page">⌂ 나의 헬스 기록</span></nav>
 
-    <header class="hero">
+    <nav class="app-tabs" aria-label="헬스 기록 화면">
+      <a class="app-tab" href="index.html?view=home" data-dashboard-tab="home" aria-current="page">홈</a>
+      <a class="app-tab" href="index.html?view=records" data-dashboard-tab="records">기록</a>
+      <a class="app-tab" href="index.html?view=analysis" data-dashboard-tab="analysis">분석</a>
+      <a class="app-tab" href="index.html?view=routine" data-dashboard-tab="routine">루틴</a>
+    </nav>
+
+    <header class="hero" data-dashboard-panel="home">
       <span class="eyebrow">Upper body project</span>
       <h1>옷 위로도 드러나는<br>좋은 상체 만들기</h1>
       <p class="summary">기록을 모으는 데서 끝내지 않고, 매번 다음 운동과 식사에서 바꿀 행동을 결정한다.</p>
@@ -1196,13 +1208,6 @@
         <div class="stat">기본 반복 수<strong id="profile-default-reps"></strong></div>
       </div>
     </header>
-
-    <nav class="app-tabs" aria-label="헬스 기록 화면">
-      <button class="app-tab" type="button" data-dashboard-tab="home" aria-pressed="true">홈</button>
-      <button class="app-tab" type="button" data-dashboard-tab="records" aria-pressed="false">기록</button>
-      <button class="app-tab" type="button" data-dashboard-tab="analysis" aria-pressed="false">분석</button>
-      <button class="app-tab" type="button" data-dashboard-tab="routine" aria-pressed="false">루틴</button>
-    </nav>
 
     <section class="priority-section" data-dashboard-panel="home" aria-labelledby="advice-title">
       <div class="coach-grid">
