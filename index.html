@@ -1020,18 +1020,100 @@
 
     @media (max-width: 760px) {
       .wrap { width: min(100% - 24px, 1120px); padding-top: 18px; }
-      .hero { border-radius: 24px; }
+      .hero { padding: 26px 20px; border-radius: 24px; }
+      section { margin-top: 42px; }
       .stats, .grid, .coach-grid, .session-summary, .muscle-map-card, .routine-grid, .composition-grid { grid-template-columns: 1fr; }
       .metrics { grid-template-columns: repeat(2, 1fr); }
+      .metric, .stat, .card, .feedback-card, .action-card, .composition-card, .muscle-map-info, .exercise-map-guide { min-width: 0; }
+      .metric strong, .exercise-filter strong, .exercise-filter small, .composition-detail, .record, .archive-content { overflow-wrap: anywhere; }
       .section-head { align-items: start; flex-direction: column; }
       .record { grid-template-columns: 1fr; gap: 8px; }
       .record-columns, .history-summary { grid-template-columns: 1fr; }
-      .calendar-day { min-height: 54px; padding: 7px; font-size: 0.85rem; }
+      .muscle-map-card { padding: 14px; gap: 18px; }
+      .body-map-visual { border-radius: 14px; }
+      .calendar-weekdays, .calendar-grid { gap: 4px; }
+      .calendar-day { min-height: 50px; padding: 6px; border-radius: 10px; font-size: 0.8rem; }
       .calendar-day.workout::after { content: ""; width: 7px; height: 7px; padding: 0; }
       .hero-goal { align-items: flex-start; flex-direction: column; }
       .exercise-filter-list { grid-template-columns: 1fr; }
       .muscle-date-filter { flex: 1 1 140px; }
       .selected-workout-summary { align-items: start; flex-direction: column; gap: 4px; }
+
+      .table-wrap,
+      .workout-table-wrap {
+        overflow: visible;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+      }
+
+      .table-wrap table,
+      .workout-history-table {
+        display: block;
+        min-width: 0;
+      }
+
+      .table-wrap thead,
+      .workout-history-table thead {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      .table-wrap tbody,
+      .workout-history-table tbody {
+        display: grid;
+        gap: 12px;
+      }
+
+      .table-wrap tr,
+      .workout-history-table tr {
+        display: grid;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 15px;
+        background: var(--paper);
+      }
+
+      .table-wrap td,
+      .workout-history-table td {
+        display: grid;
+        grid-template-columns: minmax(82px, 0.38fr) minmax(0, 1fr);
+        gap: 10px;
+        min-width: 0;
+        padding: 10px 13px;
+        border-bottom: 1px solid var(--line);
+        white-space: normal;
+        overflow-wrap: anywhere;
+      }
+
+      .table-wrap td::before,
+      .workout-history-table td::before {
+        content: attr(data-label);
+        color: var(--muted);
+        font-size: 0.75rem;
+        font-weight: 800;
+      }
+
+      .table-wrap tr td:last-child,
+      .workout-history-table tr td:last-child { border-bottom: 0; }
+
+      .workout-history-table .exercise-cell,
+      .workout-history-table .detail-cell,
+      .workout-history-table .muscle-cell { min-width: 0; }
+    }
+
+    @media (max-width: 420px) {
+      h1 { font-size: 2rem; }
+      .metrics { grid-template-columns: 1fr; }
+      .muscle-date-filter { flex-basis: 100%; width: 100%; }
+      .composition-card-head { flex-direction: column; gap: 8px; }
+      .calendar-toolbar { align-items: flex-start; }
     }
   </style>
 </head>
@@ -1662,12 +1744,12 @@
         document.getElementById("exercise-history-description").textContent = description;
         tableBody.innerHTML = historyEntries.map(({ date, workout }) => `
           <tr>
-            <td class="date-cell">${escapeHtml(formatDate(date))}</td>
-            <td class="exercise-cell">${escapeHtml(workout.name)}</td>
-            <td class="detail-cell">${escapeHtml(workout.detail || "상세 중량 미기록")}</td>
-            <td class="number-cell">${workout.sets ?? "—"}세트</td>
-            <td class="number-cell">${workout.reps ?? 10}회</td>
-            <td class="muscle-cell">${escapeHtml(workout.lastSetRir ?? workout.difficulty ?? workout.formStatus ?? "미기록")}</td>
+            <td class="date-cell" data-label="날짜">${escapeHtml(formatDate(date))}</td>
+            <td class="exercise-cell" data-label="운동">${escapeHtml(workout.name)}</td>
+            <td class="detail-cell" data-label="중량·수행">${escapeHtml(workout.detail || "상세 중량 미기록")}</td>
+            <td class="number-cell" data-label="세트">${workout.sets ?? "—"}세트</td>
+            <td class="number-cell" data-label="횟수">${workout.reps ?? 10}회</td>
+            <td class="muscle-cell" data-label="난이도·자세">${escapeHtml(workout.lastSetRir ?? workout.difficulty ?? workout.formStatus ?? "미기록")}</td>
           </tr>
         `).join("");
         panel.hidden = false;
@@ -1877,11 +1959,11 @@
       document.getElementById("body-history-empty").hidden = true;
       document.getElementById("body-history").innerHTML = recordsWithBody.map((record) => `
         <tr>
-          <td>${escapeHtml(formatDate(record.date))}</td>
-          <td>${valueWithUnit(record.body?.weight)}</td>
-          <td>${valueWithUnit(record.body?.skeletalMuscle)}</td>
-          <td>${valueWithUnit(record.body?.bodyFat)}</td>
-          <td>${valueWithUnit(record.body?.bodyWater, "L")}</td>
+          <td data-label="날짜">${escapeHtml(formatDate(record.date))}</td>
+          <td data-label="몸무게">${valueWithUnit(record.body?.weight)}</td>
+          <td data-label="골격근량">${valueWithUnit(record.body?.skeletalMuscle)}</td>
+          <td data-label="체지방량">${valueWithUnit(record.body?.bodyFat)}</td>
+          <td data-label="체수분">${valueWithUnit(record.body?.bodyWater, "L")}</td>
         </tr>
       `).join("");
     }
