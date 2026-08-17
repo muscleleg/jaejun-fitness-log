@@ -35,6 +35,40 @@ document.getElementById("goal-statement").textContent = policy.goal.statement;
 document.getElementById("goal-focus").textContent = `우선 관찰: ${policy.goal.focusAreas.join(" · ")} · 운영: ${policy.goal.preferExistingExercises ? `익숙한 ${window.exerciseCatalog.length}종목 우선` : "필요에 따라 종목 조정"}`;
 document.getElementById("muscle-map-window-description").textContent = `최근 최대 ${policy.recentWorkoutCount}회의 주동근과 보조근을 앞·뒤 인체 도해에 연결한다.`;
 
+const dashboardTabs = new Set(["home", "records", "analysis", "routine"]);
+const dashboardTabButtons = [...document.querySelectorAll("[data-dashboard-tab]")];
+const dashboardPanels = [...document.querySelectorAll("[data-dashboard-panel]")];
+
+const selectDashboardTab = (tabId, { updateHash = true, scroll = false } = {}) => {
+  const selectedTab = dashboardTabs.has(tabId) ? tabId : "home";
+
+  dashboardTabButtons.forEach((button) => {
+    button.setAttribute("aria-pressed", String(button.dataset.dashboardTab === selectedTab));
+  });
+  dashboardPanels.forEach((panel) => {
+    panel.hidden = panel.dataset.dashboardPanel !== selectedTab;
+  });
+
+  if (updateHash) history.replaceState(null, "", `#${selectedTab}`);
+
+  if (scroll) {
+    const firstPanel = dashboardPanels.find((panel) => panel.dataset.dashboardPanel === selectedTab);
+    firstPanel?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+};
+
+dashboardTabButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    selectDashboardTab(button.dataset.dashboardTab, { scroll: true });
+  });
+});
+
+window.addEventListener("hashchange", () => {
+  selectDashboardTab(window.location.hash.slice(1), { updateHash: false, scroll: true });
+});
+
+selectDashboardTab(window.location.hash.slice(1), { updateHash: false });
+
 muscleMap.zones.forEach((zone) => {
   const element = document.querySelector(`.muscle-zone.${zone.className}`);
   if (element) element.dataset.muscles = zone.muscles.join(",");

@@ -50,6 +50,50 @@
       font-size: 0.9rem;
     }
 
+    .app-tabs {
+      position: sticky;
+      z-index: 20;
+      top: 12px;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 18px;
+      padding: 8px;
+      border: 1px solid rgba(220, 229, 232, 0.92);
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.88);
+      box-shadow: 0 10px 30px rgba(28, 54, 49, 0.10);
+      backdrop-filter: blur(18px);
+    }
+
+    .app-tab {
+      min-width: 0;
+      padding: 11px 14px;
+      border: 0;
+      border-radius: 14px;
+      background: transparent;
+      color: var(--muted);
+      font: inherit;
+      font-weight: 850;
+      cursor: pointer;
+      transition: background 160ms ease, color 160ms ease, transform 160ms ease;
+    }
+
+    .app-tab:hover,
+    .app-tab:focus-visible {
+      color: var(--green);
+      background: var(--green-soft);
+      outline: 3px solid rgba(24, 121, 78, 0.10);
+    }
+
+    .app-tab[aria-pressed="true"] {
+      color: #fff;
+      background: var(--green);
+      box-shadow: 0 6px 16px rgba(24, 121, 78, 0.22);
+    }
+
+    [data-dashboard-panel][hidden] { display: none; }
+
     .hero {
       position: relative;
       overflow: hidden;
@@ -1019,8 +1063,19 @@
     }
 
     @media (max-width: 760px) {
-      .wrap { width: min(100% - 24px, 1120px); padding-top: 18px; }
+      body { padding-bottom: 88px; }
+      .wrap { width: min(100% - 24px, 1120px); padding-top: 18px; padding-bottom: 36px; }
       .hero { padding: 26px 20px; border-radius: 24px; }
+      .app-tabs {
+        position: fixed;
+        right: 12px;
+        bottom: max(12px, env(safe-area-inset-bottom));
+        left: 12px;
+        top: auto;
+        margin: 0;
+        border-radius: 18px;
+      }
+      .app-tab { padding: 11px 6px; font-size: 0.84rem; }
       section { margin-top: 42px; }
       .stats, .grid, .coach-grid, .session-summary, .muscle-map-card, .routine-grid, .composition-grid { grid-template-columns: 1fr; }
       .metrics { grid-template-columns: repeat(2, 1fr); }
@@ -1110,6 +1165,8 @@
 
     @media (max-width: 420px) {
       h1 { font-size: 2rem; }
+      .app-tabs { gap: 4px; padding: 6px; }
+      .app-tab { padding-inline: 3px; font-size: 0.78rem; }
       .metrics { grid-template-columns: 1fr; }
       .muscle-date-filter { flex-basis: 100%; width: 100%; }
       .composition-card-head { flex-direction: column; gap: 8px; }
@@ -1140,7 +1197,14 @@
       </div>
     </header>
 
-    <section class="priority-section" aria-labelledby="advice-title">
+    <nav class="app-tabs" aria-label="헬스 기록 화면">
+      <button class="app-tab" type="button" data-dashboard-tab="home" aria-pressed="true">홈</button>
+      <button class="app-tab" type="button" data-dashboard-tab="records" aria-pressed="false">기록</button>
+      <button class="app-tab" type="button" data-dashboard-tab="analysis" aria-pressed="false">분석</button>
+      <button class="app-tab" type="button" data-dashboard-tab="routine" aria-pressed="false">루틴</button>
+    </nav>
+
+    <section class="priority-section" data-dashboard-panel="home" aria-labelledby="advice-title">
       <div class="coach-grid">
         <article class="feedback-card">
           <span class="tag">Coach feedback</span>
@@ -1160,7 +1224,7 @@
       </div>
     </section>
 
-    <section aria-labelledby="status-title">
+    <section data-dashboard-panel="home" aria-labelledby="status-title">
       <div class="section-head">
         <div>
           <h2 id="status-title">최근 기록 한눈에 보기</h2>
@@ -1182,7 +1246,7 @@
       </div>
     </section>
 
-    <section aria-labelledby="composition-analysis-title">
+    <section data-dashboard-panel="analysis" aria-labelledby="composition-analysis-title">
       <div class="section-head">
         <div>
           <h2 id="composition-analysis-title">체성분 비율 분석</h2>
@@ -1201,7 +1265,7 @@
       <div class="evidence-links" id="composition-evidence-links" aria-label="체성분 분석 기준 출처"></div>
     </section>
 
-    <section aria-labelledby="muscle-map-title">
+    <section data-dashboard-panel="analysis" aria-labelledby="muscle-map-title">
       <div class="section-head">
         <div>
           <h2 id="muscle-map-title">최근 운동 자극 지도</h2>
@@ -1270,7 +1334,7 @@
       </div>
     </section>
 
-    <section aria-labelledby="routine-policy-title">
+    <section data-dashboard-panel="routine" aria-labelledby="routine-policy-title">
       <div class="section-head">
         <div>
           <h2 id="routine-policy-title">고정 상체 루틴 운영 원칙</h2>
@@ -1306,7 +1370,7 @@
       <div class="progression-rule" id="progression-rule"></div>
     </section>
 
-    <section aria-labelledby="calendar-section-title">
+    <section data-dashboard-panel="records" aria-labelledby="calendar-section-title">
       <div class="section-head">
         <div>
           <h2 id="calendar-section-title">운동 캘린더</h2>
@@ -1330,7 +1394,7 @@
       </div>
     </section>
 
-    <section aria-labelledby="body-history-title">
+    <section data-dashboard-panel="records" aria-labelledby="body-history-title">
       <div class="section-head">
         <div>
           <h2 id="body-history-title">체성분 누적 변화</h2>
@@ -1359,7 +1423,7 @@
       <div class="empty" id="body-history-empty">아직 저장된 체성분 측정값이 없습니다.</div>
     </section>
 
-    <section aria-labelledby="records-title">
+    <section data-dashboard-panel="records" aria-labelledby="records-title">
       <div class="section-head">
         <div>
           <h2 id="records-title">상세 기록 보관함</h2>
@@ -1394,7 +1458,7 @@
       </div>
     </section>
 
-    <section aria-labelledby="rules-title">
+    <section data-dashboard-panel="routine" aria-labelledby="rules-title">
       <div class="section-head">
         <div>
           <h2 id="rules-title">기록을 해석하는 원칙</h2>
