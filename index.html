@@ -1655,16 +1655,11 @@
         });
       };
 
-      const renderExerciseHistory = (exerciseName) => {
-        const historyEntries = recordsWithWorkout.flatMap((record) =>
-          record.workouts
-            .filter((workout) => workout.name === exerciseName)
-            .map((workout) => ({ date: record.date, workout }))
-        );
+      const renderHistoryTable = (title, description, historyEntries) => {
         const panel = document.getElementById("exercise-history-panel");
         const tableBody = document.getElementById("workout-history-table-body");
-        document.getElementById("exercise-history-title").textContent = `${exerciseName} 수행 이력`;
-        document.getElementById("exercise-history-description").textContent = `${historyEntries.length}회 기록 · 과거부터 같은 종목의 중량과 수행 품질 변화를 비교한다.`;
+        document.getElementById("exercise-history-title").textContent = title;
+        document.getElementById("exercise-history-description").textContent = description;
         tableBody.innerHTML = historyEntries.map(({ date, workout }) => `
           <tr>
             <td class="date-cell">${escapeHtml(formatDate(date))}</td>
@@ -1678,6 +1673,19 @@
         panel.hidden = false;
       };
 
+      const renderExerciseHistory = (exerciseName) => {
+        const historyEntries = recordsWithWorkout.flatMap((record) =>
+          record.workouts
+            .filter((workout) => workout.name === exerciseName)
+            .map((workout) => ({ date: record.date, workout }))
+        );
+        renderHistoryTable(
+          `${exerciseName} 수행 이력`,
+          `${historyEntries.length}회 기록 · 날짜별 중량과 수행 품질 변화를 비교한다.`,
+          historyEntries
+        );
+      };
+
       const renderExerciseCards = (entries, scopeLabel, scores) => {
         const workouts = entries.map((entry) => entry.workout);
         const displayEntries = uniqueExerciseEntries(entries);
@@ -1685,13 +1693,13 @@
         const historyPanel = document.getElementById("exercise-history-panel");
         historyPanel.hidden = true;
         document.getElementById("selected-workout-title").textContent = `${scopeLabel} 운동 기록`;
-        document.getElementById("selected-workout-description").textContent = "운동 박스를 선택하면 해당 종목의 모든 날짜별 수행 이력이 아래 테이블에 펼쳐진다.";
+        document.getElementById("selected-workout-description").textContent = "전체 운동 박스는 선택 기간의 전체 목록을, 개별 운동 박스는 해당 종목의 모든 날짜별 이력을 펼친다.";
         document.getElementById("selected-workout-volume").textContent = `${displayEntries.length}종목 · 누적 ${totalSets(workouts)}세트`;
 
         exerciseList.innerHTML = `
           <button class="exercise-filter" type="button" data-exercise-index="all" aria-pressed="true">
             <strong>${escapeHtml(scopeLabel)} 전체 운동</strong>
-            <small>선택 기간의 모든 자극 부위 합산</small>
+            <small>선택 기간의 자극 합산 · 누르면 전체 운동 목록 표시</small>
           </button>
           ${displayEntries.map(({ workout }, index) => `
             <button class="exercise-filter" type="button" data-exercise-index="${index}" aria-pressed="false">
@@ -1708,8 +1716,12 @@
             button.setAttribute("aria-pressed", "true");
             const index = button.dataset.exerciseIndex;
             if (index === "all") {
-              historyPanel.hidden = true;
               renderMuscleMap(scores, `${scopeLabel} 상체 분포`);
+              renderHistoryTable(
+                `${scopeLabel} 전체 운동 목록`,
+                `${entries.length}개 수행 기록 · 선택한 기간에 실시한 모든 운동을 날짜별로 표시한다.`,
+                entries
+              );
               return;
             }
             const workout = displayEntries[Number(index)].workout;
