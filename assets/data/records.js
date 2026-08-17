@@ -5,17 +5,19 @@ window.healthRecordData = [
     workouts: [],
     meals: [
       { label: "식사", items: ["김치볶음밥 (양 미확인)", "계란 프라이 1개를 올려 먹음"] },
-      { label: "음료", items: ["아이스 아메리카노 (사이즈·첨가물 미확인)", "하루농장 1개 (정확한 제품명·용량 미확인)"] },
+      { label: "음료", items: ["아이스 아메리카노 (사이즈·첨가물 미확인)", "파스퇴르 100% 유기농 야채농장 과일&야채 190ml 1팩"] },
       { label: "간식·보충제", items: ["로투스 비스코프 1조각", "미니 꿀꽈배기 과자 1조각", "미니 약과 1조각", "레몬 사탕 1개", "오쏘몰 비타민 1회분 (제품 종류 미확인)"] }
     ],
     nutritionEstimate: {
-      calories: "현재까지 약 730~1,250 kcal",
-      protein: "현재까지 약 20~34g",
-      assumptions: "김치볶음밥을 약 300~500g의 한 접시, 계란 프라이를 1개로 가정했다. 무가당 아이스 아메리카노는 열량이 거의 없는 것으로 보고, 하루농장은 정확한 제품이 확인되지 않아 일반 과채음료 1팩 범위로 잡았다. 로투스는 오리지널 비스코프 1개, 미니 꿀꽈배기·미니 약과·레몬 사탕은 작은 낱개 1개로 추정했다. 오쏘몰은 제품 종류에 따라 열량 차이가 있어 0~약 55kcal 범위만 반영했다.",
-      target: "오늘 섭취가 아직 끝나지 않은 부분 합계다. 최근 체중 65.9kg 기준 우선 단백질 목표는 약 105g/일이며, 현재 기록만 보면 약 71~85g이 남아 있다.",
+      calories: "현재까지 약 760~1,220 kcal",
+      protein: "현재까지 약 22~34g",
+      assumptions: "김치볶음밥을 약 300~500g의 한 접시, 계란 프라이를 1개로 가정했다. 무가당 아이스 아메리카노는 열량이 거의 없는 것으로 보고, 파스퇴르 100% 유기농 야채농장 과일&야채 190ml는 1팩 85kcal·단백질 2g을 반영했다. 로투스는 오리지널 비스코프 1개, 미니 꿀꽈배기·미니 약과·레몬 사탕은 작은 낱개 1개로 추정했다. 오쏘몰은 제품 종류에 따라 열량 차이가 있어 0~약 55kcal 범위만 반영했다.",
+      target: "오늘 섭취가 아직 끝나지 않은 부분 합계다. 최근 체중 65.9kg 기준 우선 단백질 목표는 약 105g/일이며, 현재 기록만 보면 약 71~83g이 남아 있다.",
       sources: [
         { label: "식품안전나라 김치볶음밥 1인분 참고", href: "https://www.foodsafetykorea.go.kr/upload/20150824/20150824011539_1440389739434.pdf" },
         { label: "로투스 비스코프 공식 영양정보", href: "https://www.lotusbiscoff.com/en-us/products/lotus-biscoff" },
+        { label: "사용자가 확인한 야채농장 상품", href: "https://www.coupang.com/vp/products/67924173?itemId=226881573&vendorItemId=91639101275" },
+        { label: "야채농장 과일&야채 190ml 영양정보", href: "https://prod.danawa.com/info/?pcode=10001697" },
         { label: "미니 꿀꽈배기 100g 참고", href: "https://www.inout.team/search/food/detail/D9O4F5wBTGIgnWnfXusb" },
         { label: "오쏘몰 이뮨 공식 제품 형태 참고", href: "https://orthomolusa.com/products/orthomol-immun" },
         { label: "운동 성인 단백질 근거", href: "https://pmc.ncbi.nlm.nih.gov/articles/PMC5477153/" }
@@ -26,9 +28,9 @@ window.healthRecordData = [
       title: "현재 판정: 오늘은 섭취 기록 중이며, 다음 식사에서 단백질을 우선 보완한다",
       points: [
         { label: "운동", text: "오늘은 아직 운동하지 않았으므로 새로운 증량 판정은 없다. 최근 운동 루틴과 강도 판단은 8월 16일 기록을 그대로 기준으로 둔다." },
-        { label: "현재까지 섭취", text: "김치볶음밥과 계란, 음료·간식을 합쳐 현재까지 약 730~1,250kcal와 단백질 20~34g으로 추정한다. 하루 전체 합계가 아니라 현재까지의 부분 합계다." },
-        { label: "단백질", text: "최근 체중 기준 우선 목표 약 105g에 비해 현재 기록만으로는 약 71~85g이 남아 있다. 다음 식사는 간식보다 뚜렷한 단백질 공급원을 중심으로 잡는 편이 좋다." },
-        { label: "추정 오차", text: "김치볶음밥 양과 하루농장·오쏘몰의 정확한 제품, 미니 간식의 실제 크기가 범위를 가장 크게 만든다." }
+        { label: "현재까지 섭취", text: "김치볶음밥과 계란, 음료·간식을 합쳐 현재까지 약 760~1,220kcal와 단백질 22~34g으로 추정한다. 하루 전체 합계가 아니라 현재까지의 부분 합계다." },
+        { label: "단백질", text: "최근 체중 기준 우선 목표 약 105g에 비해 현재 기록만으로는 약 71~83g이 남아 있다. 다음 식사는 간식보다 뚜렷한 단백질 공급원을 중심으로 잡는 편이 좋다." },
+        { label: "추정 오차", text: "김치볶음밥 양과 오쏘몰의 정확한 제품, 미니 간식의 실제 크기가 범위를 가장 크게 만든다." }
       ]
     },
     actions: [
@@ -55,19 +57,20 @@ window.healthRecordData = [
       { exerciseId: "machine-chest-press", sets: 5, reps: 10, detail: "30kg · 5세트 × 10회" }
     ],
     meals: [
-      { label: "음료·간식", items: ["스타벅스 아이스 카페 라떼 (사이즈·우유 종류 미확인)", "치킨팝 과자", "파스퇴르 야채농장 1팩 추정 (제품 종류·용량 미확인)", "빙그레 더단백 드링크 1팩 (단백질 20g, 맛 미확인)"] },
+      { label: "음료·간식", items: ["스타벅스 아이스 카페 라떼 (사이즈·우유 종류 미확인)", "치킨팝 과자", "파스퇴르 100% 유기농 야채농장 과일&야채 190ml 1팩", "빙그레 더단백 드링크 1팩 (단백질 20g, 맛 미확인)"] },
       { label: "점심", items: ["쌀국수", "모닝글로리 볶음"] },
       { label: "저녁", items: ["부침개", "된장국", "밥"] }
     ],
     nutritionEstimate: {
-      calories: "약 1,600~2,200 kcal",
-      protein: "약 66~103g",
-      assumptions: "스타벅스 아이스 카페 라떼를 일반 우유 Tall 355ml 1잔(약 110kcal·단백질 6g)으로 가정하고, 치킨팝 65g 한 봉지, 파스퇴르 야채농장 1팩(종류에 따라 약 65~110kcal), 빙그레 더단백 드링크 1팩(약 105~115kcal·단백질 20g), 쌀국수·모닝글로리 볶음·부침개·된장국·밥을 각각 보통 1인분으로 가정한 범위 추정치. 라떼 사이즈나 우유 변경 시 달라질 수 있음",
+      calories: "약 1,620~2,180 kcal",
+      protein: "약 68~103g",
+      assumptions: "스타벅스 아이스 카페 라떼를 일반 우유 Tall 355ml 1잔(약 110kcal·단백질 6g)으로 가정하고, 치킨팝 65g 한 봉지, 파스퇴르 100% 유기농 야채농장 과일&야채 190ml 1팩(85kcal·단백질 2g), 빙그레 더단백 드링크 1팩(약 105~115kcal·단백질 20g), 쌀국수·모닝글로리 볶음·부침개·된장국·밥을 각각 보통 1인분으로 가정한 범위 추정치. 라떼 사이즈나 우유 변경 시 달라질 수 있음",
       target: "건강한 운동 성인 기준 현재 체중 65.9kg의 단백질 참고 범위는 약 92~132g/일이며, 우선 목표는 약 105g/일(1.6g/kg)로 잡는다.",
       sources: [
         { label: "스타벅스 코리아 음료 영양정보", href: "https://www.starbucks.co.kr/menu/drink_list.do?CATE_CD=product_espresso" },
         { label: "오리온 치킨팝 제품정보", href: "https://www.orionworld.com/goods/view/25?badge=&category=&goodsno=18&keyname=&keyword=&page=1" },
-        { label: "파스퇴르 야채농장 제품별 영양", href: "https://www.inout.team/search/food?keyword=%EC%95%BC%EC%B1%84%EB%86%8D%EC%9E%A5" },
+        { label: "사용자가 확인한 야채농장 상품", href: "https://www.coupang.com/vp/products/67924173?itemId=226881573&vendorItemId=91639101275" },
+        { label: "야채농장 과일&야채 190ml 영양정보", href: "https://prod.danawa.com/info/?pcode=10001697" },
         { label: "빙그레 더단백 제품 영양", href: "https://prod.danawa.com/info/?pcode=110119173" },
         { label: "쌀국수·모닝글로리 영양표", href: "https://content.phocafe.co.uk/wp-content/uploads/2025/01/Pho-Nutritional-Guidelines-2024_web.pdf" },
         { label: "식품안전나라 식품교환표", href: "https://www.foodsafetykorea.go.kr/portal/board/boardDetail.do?bbs_no=bbs039&menu_grp=MENU_NEW03&menu_no=4847&ntctxt_no=22498" },
@@ -82,7 +85,7 @@ window.healthRecordData = [
         { label: "관찰 대상", text: "상부 가슴은 체스트프레스 각도에 따라, 이두는 직접 운동이 없다는 점에서 향후 부족 여부를 확인한다." },
         { label: "훈련량 주의", text: "세트당 10회로 총 35세트다. 주 몇 회 반복하는지와 마지막 세트 여유를 알아야 과하거나 적은지 판단할 수 있다." },
         { label: "현재 체성분 위치", text: "BMI 21.3과 체지방량지수(FMI) 4.0은 각각 한국 정상 체중·NHANES 남성 정상 지방량 구간이다. 큰 폭의 감량보다 체지방 급증 없이 골격근과 제지방을 늘리는 방향이 현재 목표에 더 맞다." },
-        { label: "영양", text: "아이스 카페 라떼, 야채농장과 더단백을 포함해 약 1,600~2,200kcal와 단백질 66~103g으로 추정한다. 우선 목표 105g보다 약 2~39g 부족했을 가능성이 있다." },
+        { label: "영양", text: "아이스 카페 라떼, 야채농장과 더단백을 포함해 약 1,620~2,180kcal와 단백질 68~103g으로 추정한다. 우선 목표 105g보다 약 2~37g 부족했을 가능성이 있다." },
         { label: "증량 판단", text: "이번 한 번의 5세트×10회 기록만으로는 증량하지 않는다. 자세와 남은 반복 여유가 2회 연속 확인되면 올린다." }
       ]
     },
@@ -91,7 +94,7 @@ window.healthRecordData = [
       "각 종목 마지막 세트가 쉬움(3회 이상 가능)·적당(1~2회 가능)·한계(0회) 중 어디였는지 기록한다.",
       "모든 세트 10회와 2회 이상의 여유가 2번 연속 확인된 종목만 다음 최소 단위로 증량한다.",
       "주당 이 상체 루틴을 몇 회 할 계획인지 기록해 35세트의 적정성을 판단한다.",
-      "아이스 카페 라떼와 더단백을 포함해도 단백질이 약 2~39g 부족할 수 있으므로 다음 끼니에서 단백질 식품을 보완한다."
+      "아이스 카페 라떼와 더단백을 포함해도 단백질이 약 2~37g 부족할 수 있으므로 다음 끼니에서 단백질 식품을 보완한다."
     ]
   }
 ];
