@@ -1,6 +1,56 @@
 // 새 기록은 날짜별 객체로 이 배열에 추가한다. 같은 날짜의 후속 정보는 기존 객체에 병합한다.
 window.healthRecordData = [
   {
+    date: "2026-08-20",
+    workouts: [],
+    meals: [
+      { label: "점심", items: ["로스카츠 (세트 구성·양 미확인)"] },
+      { label: "저녁", items: ["스팸 김치볶음밥 (양 미확인)", "두부전 (양·소스 미확인)", "파스퇴르 100% 유기농 야채농장 과일&야채 190ml 1팩 (당류 12g)"] },
+      { label: "음료", items: ["아메리카노 2잔 (사이즈·첨가물 미확인)"] }
+    ],
+    nutritionEstimate: {
+      calories: "약 1,550~2,450 kcal",
+      protein: "약 60~98g",
+      freeSugar: "약 26~55g",
+      nutrients: {
+        energy: { min: 1550, max: 2450, unit: "kcal" },
+        protein: { min: 60, max: 98, unit: "g" },
+        carbohydrate: { min: 170, max: 275, unit: "g" },
+        totalFat: { min: 63, max: 118, unit: "g" },
+        saturatedFat: { min: 12, max: 30, unit: "g" },
+        freeSugar: { min: 26, max: 55, unit: "g" },
+        fiber: { min: 5, max: 13, unit: "g" },
+        sodium: { min: 3000, max: 6200, unit: "mg" }
+      },
+      assumptions: "로스카츠는 밥·양배추·소스가 함께 나오는 보통 1인 세트일 수 있어 이를 포함한 범위로, 스팸 김치볶음밥은 밥 한 공기와 스팸 약 60~120g, 두부전은 두부 약 100~200g과 부침기름·간장 소스를 가정했다. 야채농장은 사용자 확인값인 당류 12g을 반영했고, 아메리카노는 무가당으로 계산했다. 로스카츠 세트의 밥·소스 양, 스팸 사용량, 두부전의 기름과 간장 소스가 범위를 가장 크게 만든다.",
+      target: "최근 측정 체중 65.8kg 기준 단백질 우선 목표는 약 105g/일이다. 에너지·탄수화물·지방·식이섬유는 2025 한국인 영양소 섭취기준의 남성 30~49세 참고치와, 포화지방·유리당·나트륨은 WHO 상한과 비교한다. 2,500kcal는 집단 참고치라 개인 필요량과 다를 수 있다.",
+      sources: [
+        { label: "식약처 K-FIND 식품영양성분 DB", href: "https://various.foodsafetykorea.go.kr/nutrient/" },
+        { label: "식약처 두부 영양정보", href: "https://various.foodsafetykorea.go.kr/nutrient/general/food/detail.do?searchFoodCd=P106-000000100-0001&searchMonthCd=AVG&searchRegionCd=ZZ" },
+        { label: "사용자가 확인한 야채농장 상품", href: "https://www.coupang.com/vp/products/67924173?itemId=226881573&vendorItemId=91639101275" },
+        { label: "운동 성인 단백질 근거", href: "https://pmc.ncbi.nlm.nih.gov/articles/PMC5477153/" }
+      ]
+    },
+    condition: "운동하지 않음 · 체성분 미측정 · 음식 중량 미기록",
+    advice: {
+      title: "현재 판정: 휴식은 적절하고, 오늘은 단백질 보완과 나트륨 관리가 우선이다",
+      points: [
+        { label: "휴식", text: "전날 39세트 상체 운동 뒤 오늘은 운동하지 않았다. 어깨 프레스 볼륨이 컸던 만큼 휴식일은 회복에 적절하다." },
+        { label: "영양", text: "약 1,550~2,450kcal와 단백질 60~98g으로 추정한다. 단백질은 목표 105g의 57~93%라 오늘 기록만 보면 부족 가능성이 높다. 추가 식사를 한다면 스팸이나 튀김보다 두부·달걀·생선·살코기처럼 비교적 담백한 단백질을 우선한다." },
+        { label: "영양 균형", text: "지방은 권고 상한 83g의 76~142%로 높을 수 있고, 나트륨은 약 3,000~6,200mg으로 상한 2,000mg의 150~310%다. 로스카츠·스팸·김치와 간장 소스가 겹친 영향이다." },
+        { label: "유리당", text: "유리당은 약 26~55g으로 참고 상한 약 63g 안일 가능성이 있다. 야채농장 12g과 돈가스·볶음밥 소스가 주된 원인이라 오늘은 단 음료를 추가하지 않으면 관리 가능한 범위다." },
+        { label: "식이섬유", text: "식이섬유는 5~13g으로 30g 목표보다 부족하다. 다음 끼니에 통과일 1개와 채소 또는 콩류를 더하면 가장 간단하게 보완된다." },
+        { label: "추정 오차", text: "로스카츠 세트의 밥·소스 양과 스팸 김치볶음밥의 스팸 사용량이 열량·나트륨 범위를 크게 만든다." }
+      ]
+    },
+    actions: [
+      "오늘 남은 식사에는 국물·가공육·짠 반찬을 더하지 않는다.",
+      "배가 고프면 과자보다 무가당 그릭요거트, 두부, 달걀, 우유 중 하나를 선택해 단백질을 보완한다.",
+      "다음 끼니에 채소 반찬과 통과일을 함께 먹어 식이섬유를 보완한다.",
+      "다음 상체 운동 전에는 어깨 통증과 전면 어깨 피로가 남아 있는지 확인하고, 남아 있으면 프레스 중량을 올리지 않는다."
+    ]
+  },
+  {
     date: "2026-08-19",
     workouts: [
       { exerciseId: "cable-one-arm-lateral-raise", sets: 5, reps: 10, detail: "한 팔당 5kg · 양쪽 각 5세트 × 10회" },
