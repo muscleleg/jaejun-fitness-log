@@ -9,6 +9,7 @@ const freeSugarReferenceIdeal = Math.round(nutritionReference.energyKcal * freeS
 const exercisesById = new Map(window.exerciseCatalog.map((exercise) => [exercise.id, exercise]));
 const healthRecords = window.healthRecordData.map((record) => ({
   ...record,
+  workoutStatusKnown: Object.hasOwn(record, "workouts"),
   workouts: record.workouts?.map((workout) => {
     const exercise = exercisesById.get(workout.exerciseId);
     if (!exercise) {
@@ -312,7 +313,8 @@ const recordQualityLabels = (record) => {
   if (hasWorkout && !hasWorkoutQuality) labels.push("RIR·난이도 미완성");
   if (!hasMeals) labels.push("식사 없음");
   if (hasMeals && !record.nutritionEstimate?.nutrients) labels.push("상세 영양 추정 없음");
-  if (!hasWorkout && Array.isArray(record.workouts)) labels.push("휴식일");
+  if (!hasWorkout && record.workoutStatusKnown) labels.push("휴식일");
+  if (!hasWorkout && !record.workoutStatusKnown) labels.push("운동 여부 없음");
   return labels.length ? labels : ["핵심 기록 완료"];
 };
 
@@ -977,7 +979,7 @@ if (sortedRecords.length) {
         </div>
         <div>
           <h4>운동</h4>
-          <p>${record.workouts?.length ? record.workouts.map((workout) => `${escapeHtml(workout.name)}${workout.detail ? ` (${escapeHtml(workout.detail)})` : ""}`).join(", ") : "기록 없음"}</p>
+          <p>${record.workouts?.length ? record.workouts.map((workout) => `${escapeHtml(workout.name)}${workout.detail ? ` (${escapeHtml(workout.detail)})` : ""}`).join(", ") : record.workoutStatusKnown ? "운동하지 않음" : "운동 여부 미기록"}</p>
           <h4 style="margin-top: 14px;">식사</h4>
           <p>${record.meals?.length ? record.meals.map((meal) => `${escapeHtml(meal.label)}: ${escapeHtml(meal.items.join(", "))}`).join(" / ") : "기록 없음"}</p>
           ${renderNutritionEstimate(record.nutritionEstimate)}
