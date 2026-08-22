@@ -5,6 +5,8 @@ window.coachingPolicy = Object.freeze({
     preferExistingExercises: true
   },
   recentWorkoutCount: 3,
+  rollingWindowDays: 7,
+  bodyTrendMinimumMeasurements: 5,
   stimulus: {
     primaryWeight: 1,
     secondaryWeight: 0.5,

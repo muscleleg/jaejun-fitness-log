@@ -280,6 +280,47 @@ const sortedRecords = [...healthRecords].sort((a, b) => b.date.localeCompare(a.d
 const recordsWithBody = sortedRecords.filter((record) => record.body && Object.values(record.body).some((value) => value !== null && value !== undefined && value !== ""));
 const recordsWithWorkout = sortedRecords.filter((record) => record.workouts?.length);
 const recordsWithMeals = sortedRecords.filter((record) => record.meals?.length);
+const rollingWindowDays = policy.rollingWindowDays ?? 7;
+const dateFromKey = (date) => new Date(`${date}T00:00:00`);
+const latestRecordDate = sortedRecords[0]?.date;
+const rollingWindowEnd = latestRecordDate ? dateFromKey(latestRecordDate) : new Date();
+const rollingWindowStart = new Date(rollingWindowEnd);
+rollingWindowStart.setDate(rollingWindowEnd.getDate() - rollingWindowDays + 1);
+const rollingRecords = sortedRecords.filter((record) => {
+  const date = dateFromKey(record.date);
+  return date >= rollingWindowStart && date <= rollingWindowEnd;
+});
+const rollingWorkoutRecords = rollingRecords.filter((record) => record.workouts?.length);
+const rollingMealRecords = rollingRecords.filter((record) => record.meals?.length);
+const rollingRangeLabel = latestRecordDate
+  ? `${new Intl.DateTimeFormat("ko-KR", { month: "numeric", day: "numeric" }).format(rollingWindowStart)}–${new Intl.DateTimeFormat("ko-KR", { month: "numeric", day: "numeric" }).format(rollingWindowEnd)}`
+  : "기록 대기 중";
+
+const sumWorkoutSets = (workouts) => workouts.reduce((sum, workout) => sum + (Number(workout.sets) || 0), 0);
+
+const recordQualityLabels = (record) => {
+  const labels = [];
+  const hasBody = record.body && Object.values(record.body).some((value) => value !== null && value !== undefined && value !== "");
+  const hasMeals = record.meals?.length;
+  const hasWorkout = record.workouts?.length;
+  const hasWorkoutQuality = hasWorkout && record.workouts.every((workout) =>
+    (workout.lastSetRir !== null && workout.lastSetRir !== undefined)
+      || Boolean(workout.difficulty)
+  );
+
+  if (!hasBody) labels.push("체성분 없음");
+  if (hasWorkout && !hasWorkoutQuality) labels.push("RIR·난이도 미완성");
+  if (!hasMeals) labels.push("식사 없음");
+  if (hasMeals && !record.nutritionEstimate?.nutrients) labels.push("상세 영양 추정 없음");
+  if (!hasWorkout && Array.isArray(record.workouts)) labels.push("휴식일");
+  return labels.length ? labels : ["핵심 기록 완료"];
+};
+
+const renderQualityBadges = (record) => {
+  const labels = recordQualityLabels(record);
+  const complete = labels.length === 1 && labels[0] === "핵심 기록 완료";
+  return `<div class="quality-badges" aria-label="기록 완성도">${labels.map((label) => `<span class="quality-badge${complete ? " complete" : ""}">${escapeHtml(label)}</span>`).join("")}</div>`;
+};
 
 const formatNutritionNumber = (value) => Number(value).toLocaleString("ko-KR", {
   maximumFractionDigits: Number.isInteger(value) ? 0 : 1
@@ -363,8 +404,8 @@ const renderNutrientBalance = (record) => {
   const cards = Object.entries(definitions)
     .filter(([key]) => nutrients[key])
     .map(([key, definition]) => renderNutrientCard(key, nutrients[key], definition));
-  const balancePoint = record.advice?.points?.find((point) => point.label === "영양 균형");
-  const sugarPoint = record.advice?.points?.find((point) => point.label === "유리당");
+  const balancePoint = record.advice?.points?.find((point) => ["영양 균형", "당·나트륨"].includes(point.label));
+  const sugarPoint = record.advice?.points?.find((point) => ["유리당", "당·나트륨"].includes(point.label));
   const referenceSources = [...nutritionReference.sources, ...freeSugarPolicy.sources];
 
   document.getElementById("nutrient-balance-date").textContent = formatDate(record.date);
@@ -372,7 +413,7 @@ const renderNutrientBalance = (record) => {
   document.getElementById("nutrient-balance-feedback").innerHTML = `
     <strong class="feedback-title">오늘의 피드백</strong>
     ${escapeHtml(balancePoint?.text ?? "영양소별 추정 범위를 다음 기록과 비교합니다.")}
-    ${sugarPoint ? `<span class="nutrition-focus-point">${escapeHtml(sugarPoint.text)}</span>` : ""}
+    ${sugarPoint && sugarPoint !== balancePoint ? `<span class="nutrition-focus-point">${escapeHtml(sugarPoint.text)}</span>` : ""}
   `;
   document.getElementById("nutrition-reference-note").textContent = `${nutritionReference.label}의 ${nutritionReference.energyKcal.toLocaleString("ko-KR")}kcal는 같은 연령대 남성의 집단 참고치이며 개인 처방값이 아니다. 실제 필요량은 활동량과 목표에 따라 달라진다. 파란 막대는 음식량이 불명확해 생기는 추정 범위다.`;
   document.getElementById("nutrition-reference-links").innerHTML = renderSourceLinks(referenceSources);
@@ -381,8 +422,8 @@ const renderNutrientBalance = (record) => {
 const latestMealRecord = recordsWithMeals[0];
 if (latestMealRecord) {
   const estimate = latestMealRecord.nutritionEstimate;
-  const nutritionPoint = latestMealRecord.advice?.points?.find((point) => point.label === "영양");
-  const sugarPoint = latestMealRecord.advice?.points?.find((point) => point.label === "유리당");
+  const nutritionPoint = latestMealRecord.advice?.points?.find((point) => ["영양", "단백질"].includes(point.label));
+  const sugarPoint = latestMealRecord.advice?.points?.find((point) => ["유리당", "당·나트륨"].includes(point.label));
   document.getElementById("nutrition-overview-date").textContent = formatDate(latestMealRecord.date);
   document.getElementById("nutrition-overview-metrics").innerHTML = `
     <div class="metric"><span>추정 섭취 열량</span><strong>${estimate ? escapeHtml(estimate.calories) : "—"}</strong></div>
@@ -398,6 +439,74 @@ if (latestMealRecord) {
   `;
   renderNutrientBalance(latestMealRecord);
 }
+
+const rollingWorkoutEntries = rollingWorkoutRecords.flatMap((record) =>
+  record.workouts.map((workout) => ({ date: record.date, workout }))
+);
+const rollingTotalSets = sumWorkoutSets(rollingWorkoutEntries.map(({ workout }) => workout));
+const rollingQualityEntries = rollingWorkoutEntries.filter(({ workout }) =>
+  workout.lastSetRir !== null && workout.lastSetRir !== undefined || Boolean(workout.difficulty)
+);
+const rollingMuscleLoad = new Map();
+const addRollingMuscleLoad = (muscle, value) => rollingMuscleLoad.set(muscle, (rollingMuscleLoad.get(muscle) ?? 0) + value);
+rollingWorkoutEntries.forEach(({ workout }) => {
+  workout.primaryMuscles?.forEach((muscle) => addRollingMuscleLoad(muscle, (workout.sets ?? 0) * policy.stimulus.primaryWeight));
+  workout.secondaryMuscles?.forEach((muscle) => addRollingMuscleLoad(muscle, (workout.sets ?? 0) * policy.stimulus.secondaryWeight));
+});
+const topRollingMuscles = [...rollingMuscleLoad.entries()].sort((a, b) => b[1] - a[1]).slice(0, 3);
+const chronologicalWorkoutDates = rollingWorkoutRecords.map((record) => dateFromKey(record.date)).sort((a, b) => a - b);
+const workoutGaps = chronologicalWorkoutDates.slice(1).map((date, index) =>
+  Math.round((date - chronologicalWorkoutDates[index]) / 86400000)
+);
+const shortestWorkoutGap = workoutGaps.length ? Math.min(...workoutGaps) : null;
+const rollingBodyDays = rollingRecords.filter((record) => record.body).length;
+const rollingDetailedNutritionDays = rollingMealRecords.filter((record) => record.nutritionEstimate?.nutrients).length;
+
+document.getElementById("weekly-coaching-range").textContent = rollingRangeLabel;
+document.getElementById("weekly-coaching-metrics").innerHTML = `
+  <div class="metric"><span>운동일</span><strong>${rollingWorkoutRecords.length}일</strong><time class="metric-date">최근 ${rollingWindowDays}일</time></div>
+  <div class="metric"><span>총 운동량</span><strong>${rollingTotalSets}세트</strong><time class="metric-date">${rollingWorkoutEntries.length}개 종목 기록</time></div>
+  <div class="metric"><span>식사 기록</span><strong>${rollingMealRecords.length}일</strong><time class="metric-date">상세 분석 ${rollingDetailedNutritionDays}일</time></div>
+  <div class="metric"><span>체성분 측정</span><strong>${rollingBodyDays}일</strong><time class="metric-date">같은 조건 추세 우선</time></div>
+`;
+document.getElementById("weekly-training-insight").innerHTML = `
+  <div class="insight-item"><strong>빈도와 총량</strong>${rollingWorkoutRecords.length}일에 ${rollingTotalSets}세트가 기록됐다.${shortestWorkoutGap === null ? "" : ` 가장 짧은 운동 간격은 ${shortestWorkoutGap}일이다.`} 이 수치만으로 과훈련을 단정할 수 없어 통증·수면·마지막 세트 여유를 함께 본다.</div>
+  <div class="insight-item"><strong>가장 많이 포함된 부위</strong>${topRollingMuscles.length ? topRollingMuscles.map(([muscle, score]) => `${escapeHtml(muscle)} ${formatNutritionNumber(score)}점`).join(" · ") : "운동 기록 없음"} · 주동근 1, 보조근 0.5 가중치의 상대적 집계다.</div>
+`;
+document.getElementById("weekly-data-quality").innerHTML = `
+  <div class="insight-item"><strong>증량 판단 데이터</strong>RIR·난이도가 있는 운동은 ${rollingQualityEntries.length}/${rollingWorkoutEntries.length}개다. 다음 운동에서는 각 종목 마지막 세트의 남은 반복 수를 가장 먼저 기록한다.</div>
+  <div class="insight-item"><strong>추세 판단 데이터</strong>체성분 ${rollingBodyDays}일 · 상세 영양 ${rollingDetailedNutritionDays}일이다. 체성분은 최소 ${policy.bodyTrendMinimumMeasurements ?? 5}회가 쌓일 때까지 단일 증감을 결론으로 쓰지 않는다.</div>
+`;
+
+const nutritionReferenceWeight = Number(recordsWithBody.find((record) => Number(record.body?.weight))?.body.weight);
+const nutritionDefinitions = Number.isFinite(nutritionReferenceWeight) ? buildNutrientDefinitions(nutritionReferenceWeight) : null;
+const analyzableNutritionRecords = rollingMealRecords.filter((record) => record.nutritionEstimate?.nutrients);
+const countNutrientStatus = (key, statusKeys) => analyzableNutritionRecords.filter((record) => {
+  const intake = record.nutritionEstimate.nutrients[key];
+  const definition = nutritionDefinitions?.[key];
+  return intake && definition && statusKeys.includes(nutrientStatus(intake, definition).key);
+}).length;
+const proteinCompleteDays = countNutrientStatus("protein", ["ok"]);
+const proteinPossibleDays = countNutrientStatus("protein", ["mixed"]);
+const sugarHighDays = countNutrientStatus("freeSugar", ["high"]);
+const sodiumHighDays = countNutrientStatus("sodium", ["high"]);
+const sweetPattern = /사탕|과자|주스|야채농장|더위사냥|로투스|약과|치킨팝|크래커/;
+const sweetFoodDays = rollingMealRecords.filter((record) =>
+  record.meals.some((meal) => meal.items.some((item) => sweetPattern.test(item)))
+).length;
+
+document.getElementById("nutrition-weekly-range").textContent = rollingRangeLabel;
+document.getElementById("nutrition-weekly-metrics").innerHTML = `
+  <div class="metric"><span>분석 가능한 식사</span><strong>${analyzableNutritionRecords.length}일</strong><time class="metric-date">식사 기록 ${rollingMealRecords.length}일</time></div>
+  <div class="metric"><span>단백질 목표 확실 충족</span><strong>${proteinCompleteDays}일</strong><time class="metric-date">충족 가능 ${proteinPossibleDays}일</time></div>
+  <div class="metric"><span>유리당 초과 가능</span><strong>${sugarHighDays}일</strong><time class="metric-date">상한 ${freeSugarReferenceMax}g 기준</time></div>
+  <div class="metric"><span>단 간식·음료 등장</span><strong>${sweetFoodDays}일</strong><time class="metric-date">제품·주스·과자 포함</time></div>
+`;
+document.getElementById("nutrition-weekly-feedback").innerHTML = `
+  <strong class="feedback-title">이번 기간의 패턴</strong>
+  상세 추정이 가능한 ${analyzableNutritionRecords.length}일 중 단백질 목표를 확실히 채운 날은 ${proteinCompleteDays}일이고, 유리당 초과 가능일은 ${sugarHighDays}일, 나트륨 초과 가능일은 ${sodiumHighDays}일이다. 단 음식 자체를 금지하기보다 주스·아이스크림·과자가 겹치는 날을 줄이고, 운동일 저녁에 단백질 30~40g이 분명한 식품을 먼저 배치한다.
+  <span class="muted">음식량이 불명확한 날의 범위 추정이므로 일수는 확정 섭취량이 아니라 위험 신호로 본다.</span>
+`;
 
 const recentMuscleRecords = recordsWithWorkout.slice(0, policy.recentWorkoutCount);
 const latestMuscleRecord = recentMuscleRecords[0];
@@ -566,6 +675,73 @@ if (latestMuscleRecord) {
   selectMuscleDate("recent");
 }
 
+const exerciseHistories = new Map();
+recordsWithWorkout.forEach((record) => {
+  record.workouts.forEach((workout) => {
+    const history = exerciseHistories.get(workout.exerciseId) ?? [];
+    history.push({ date: record.date, workout });
+    exerciseHistories.set(workout.exerciseId, history);
+  });
+});
+
+const completesTargetReps = (workout) => {
+  if (workout.repsBySet?.length) {
+    return workout.repsBySet.length === workout.sets
+      && workout.repsBySet.every((reps) => Number(reps) >= policy.progression.targetReps);
+  }
+  return Number(workout.reps) >= policy.progression.targetReps;
+};
+
+const hasExecutionIssue = (workout) => /통증|중단|미달|무너/.test(workout.formStatus ?? "");
+const workoutRir = (workout) => {
+  if (workout.lastSetRir === null || workout.lastSetRir === undefined || workout.lastSetRir === "") return null;
+  const value = Number(workout.lastSetRir);
+  return Number.isFinite(value) ? value : null;
+};
+
+const progressionRows = [...exerciseHistories.values()].map((history) => {
+  const latest = history[0];
+  const recent = history.slice(0, policy.progression.requiredSessions);
+  const latestComplete = completesTargetReps(latest.workout);
+  const latestRir = workoutRir(latest.workout);
+  const successfulSessions = recent.filter(({ workout }) =>
+    completesTargetReps(workout)
+      && !hasExecutionIssue(workout)
+      && workoutRir(workout) !== null
+      && workoutRir(workout) >= policy.progression.minimumRir
+  ).length;
+
+  let verdict = { key: "missing", label: "RIR 필요", detail: "모든 세트 완료 여부만으로는 증량하지 않는다." };
+  if (hasExecutionIssue(latest.workout) || !latestComplete) {
+    verdict = { key: "adjust", label: "수행 조정", detail: "반복 미달·중단 또는 통증 기록을 먼저 정리한다." };
+  } else if (successfulSessions >= policy.progression.requiredSessions) {
+    verdict = { key: "candidate", label: "증량 후보", detail: "연속 성공 조건을 충족했다. 다음 최소 단위를 검토한다." };
+  } else if (latestRir !== null) {
+    verdict = { key: "hold", label: "현재 유지", detail: `성공 조건 ${successfulSessions}/${policy.progression.requiredSessions}회. 같은 중량에서 누적한다.` };
+  }
+
+  return { history, latest, recent, verdict, latestRir };
+}).sort((a, b) => a.latest.workout.name.localeCompare(b.latest.workout.name, "ko"));
+
+document.getElementById("progression-table-body").innerHTML = progressionRows.map(({ latest, recent, verdict, latestRir }) => `
+  <tr>
+    <td data-label="운동">${escapeHtml(latest.workout.name)}</td>
+    <td data-label="최근 수행">${escapeHtml(latest.workout.detail || `${latest.workout.sets}세트 × ${formatWorkoutReps(latest.workout)}회`)}<br><small>${escapeHtml(metricDate(latest))}</small></td>
+    <td data-label="최근 2회">${recent.map(({ date, workout }) => `${escapeHtml(new Intl.DateTimeFormat("ko-KR", { month: "numeric", day: "numeric" }).format(dateFromKey(date)))} · ${escapeHtml(formatWorkoutReps(workout))}회`).join("<br>")}</td>
+    <td data-label="수행 품질">${escapeHtml(latest.workout.formStatus ?? latest.workout.difficulty ?? (latestRir === null ? "RIR·난이도 미기록" : `마지막 세트 RIR ${latestRir}`))}</td>
+    <td data-label="현재 판정"><span class="status-pill ${verdict.key}">${escapeHtml(verdict.label)}</span><br><small>${escapeHtml(verdict.detail)}</small></td>
+  </tr>
+`).join("");
+const progressionCounts = progressionRows.reduce((counts, row) => {
+  counts[row.verdict.key] = (counts[row.verdict.key] ?? 0) + 1;
+  return counts;
+}, {});
+document.getElementById("progression-summary").textContent = `증량 후보 ${progressionCounts.candidate ?? 0} · 조정 ${progressionCounts.adjust ?? 0} · RIR 필요 ${progressionCounts.missing ?? 0}`;
+document.getElementById("progression-feedback").innerHTML = `
+  <strong>현재 가장 중요한 입력</strong><br>
+  기록된 종목 중 증량 후보는 ${progressionCounts.candidate ?? 0}개다. 반복 미달이나 중단이 있는 종목은 먼저 수행을 안정시키고, 나머지는 마지막 세트에 몇 회 더 할 수 있었는지를 남겨야 연속 ${policy.progression.requiredSessions}회 규칙을 자동 판정할 수 있다.
+`;
+
 const latestWorkoutDate = recordsWithWorkout[0]?.date;
 const initialCalendarDate = latestWorkoutDate
   ? new Date(`${latestWorkoutDate}T00:00:00`)
@@ -693,6 +869,60 @@ if (sortedRecords.length) {
   }
 }
 
+const bodyTrendDefinitions = [
+  { key: "weight", label: "체중", unit: "kg" },
+  { key: "skeletalMuscle", label: "골격근량", unit: "kg" },
+  { key: "bodyFat", label: "체지방량", unit: "kg" },
+  { key: "bodyWater", label: "체수분", unit: "L" }
+];
+const chronologicalBodyRecords = [...recordsWithBody].reverse();
+const renderTrendCard = ({ key, label, unit }) => {
+  const points = chronologicalBodyRecords
+    .map((record) => ({ date: record.date, value: Number(record.body?.[key]) }))
+    .filter((point) => Number.isFinite(point.value));
+  if (!points.length) return "";
+  const values = points.map((point) => point.value);
+  const first = points[0];
+  const latest = points.at(-1);
+  const delta = latest.value - first.value;
+  const rawMin = Math.min(...values);
+  const rawMax = Math.max(...values);
+  const padding = Math.max((rawMax - rawMin) * 0.25, 0.2);
+  const scaleMin = rawMin - padding;
+  const scaleMax = rawMax + padding;
+  const x = (index) => points.length === 1 ? 50 : 8 + index / (points.length - 1) * 84;
+  const y = (value) => 94 - (value - scaleMin) / (scaleMax - scaleMin) * 76;
+  const linePoints = points.map((point, index) => `${x(index).toFixed(1)},${y(point.value).toFixed(1)}`).join(" ");
+  const deltaClass = delta < 0 ? " down" : "";
+  const deltaText = `${delta > 0 ? "+" : ""}${delta.toFixed(1)}${unit}`;
+
+  return `
+    <article class="trend-card">
+      <div class="trend-card-head">
+        <div><h3>${escapeHtml(label)}</h3><p class="muted">현재 ${latest.value.toFixed(1)}${escapeHtml(unit)}</p></div>
+        <span class="trend-change${deltaClass}">${escapeHtml(deltaText)}</span>
+      </div>
+      <svg class="trend-chart" viewBox="0 0 100 110" role="img" aria-label="${escapeHtml(label)} ${points.length}회 변화">
+        <line class="grid-line" x1="8" y1="18" x2="92" y2="18"></line>
+        <line class="grid-line" x1="8" y1="56" x2="92" y2="56"></line>
+        <line class="grid-line" x1="8" y1="94" x2="92" y2="94"></line>
+        ${points.length > 1 ? `<polyline class="data-line" points="${linePoints}"></polyline>` : ""}
+        ${points.map((point, index) => `<circle class="data-point" cx="${x(index).toFixed(1)}" cy="${y(point.value).toFixed(1)}" r="3"><title>${escapeHtml(formatDate(point.date))} ${point.value.toFixed(1)}${escapeHtml(unit)}</title></circle>`).join("")}
+      </svg>
+      <p class="trend-meta">${escapeHtml(formatDate(first.date))} → ${escapeHtml(formatDate(latest.date))} · ${points.length}회 측정</p>
+    </article>
+  `;
+};
+
+if (recordsWithBody.length) {
+  const minimumMeasurements = policy.bodyTrendMinimumMeasurements ?? 5;
+  document.getElementById("body-trend-status").textContent = recordsWithBody.length >= minimumMeasurements
+    ? `${recordsWithBody.length}회 · 추세 관찰 가능`
+    : `${recordsWithBody.length}/${minimumMeasurements}회 · 판단 보류`;
+  document.getElementById("body-trend-grid").innerHTML = bodyTrendDefinitions.map(renderTrendCard).join("");
+  document.getElementById("body-trend-note").innerHTML = `<strong>해석</strong> 현재 ${recordsWithBody.length}회 측정이라 선은 변화 사실만 보여준다. 같은 기기·비슷한 시간·비슷한 수분과 식사 조건의 측정이 ${minimumMeasurements}회 이상 쌓인 뒤 여러 주 방향을 판단한다.`;
+}
+
 if (recordsWithBody.length) {
   document.getElementById("body-history-wrap").hidden = false;
   document.getElementById("body-history-empty").hidden = true;
@@ -710,7 +940,7 @@ if (recordsWithBody.length) {
 if (recordsWithMeals.length) {
   document.getElementById("nutrition-list").innerHTML = recordsWithMeals.map((record) => `
     <article class="record">
-      <time datetime="${escapeHtml(record.date)}">${escapeHtml(formatDate(record.date))}</time>
+      <div class="record-meta"><time datetime="${escapeHtml(record.date)}">${escapeHtml(formatDate(record.date))}</time>${renderQualityBadges(record)}</div>
       <div>
         ${record.meals.map((meal) => `
           <h4>${escapeHtml(meal.label)}</h4>
@@ -725,7 +955,7 @@ if (recordsWithMeals.length) {
 if (recordsWithWorkout.length) {
   document.getElementById("workout-list").innerHTML = recordsWithWorkout.map((record) => `
     <article class="record">
-      <time datetime="${escapeHtml(record.date)}">${escapeHtml(formatDate(record.date))}</time>
+      <div class="record-meta"><time datetime="${escapeHtml(record.date)}">${escapeHtml(formatDate(record.date))}</time>${renderQualityBadges(record)}</div>
       <div>
         <ul class="plain-list">
           ${record.workouts.map((workout) => `<li><strong>${escapeHtml(workout.name)}</strong>${workout.detail ? ` · ${escapeHtml(workout.detail)}` : ""}</li>`).join("")}
@@ -738,7 +968,7 @@ if (recordsWithWorkout.length) {
 if (sortedRecords.length) {
   document.getElementById("record-list").innerHTML = sortedRecords.map((record) => `
     <article class="record">
-      <time datetime="${escapeHtml(record.date)}">${escapeHtml(formatDate(record.date))}</time>
+      <div class="record-meta"><time datetime="${escapeHtml(record.date)}">${escapeHtml(formatDate(record.date))}</time>${renderQualityBadges(record)}</div>
       <div class="record-columns">
         <div>
           <h4>상태</h4>

@@ -386,6 +386,106 @@
       font-size: 1.08rem;
     }
 
+    .metrics.weekly-metrics { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+    .weekly-decision-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .weekly-card {
+      min-width: 0;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: var(--paper);
+      box-shadow: 0 9px 30px rgba(28, 54, 49, 0.05);
+    }
+
+    .weekly-card h3 { margin: 10px 0 14px; }
+
+    .insight-stack {
+      display: grid;
+      gap: 9px;
+    }
+
+    .insight-item {
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: #f4f8f6;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .insight-item strong {
+      display: block;
+      margin-bottom: 3px;
+      color: var(--ink);
+    }
+
+    .decision-table-wrap { border-radius: 18px; }
+    .progression-table { min-width: 900px; font-size: 0.86rem; }
+    .progression-table td { white-space: normal; vertical-align: top; }
+    .progression-table td:first-child { min-width: 180px; font-weight: 850; }
+    .progression-table td:nth-child(2) { min-width: 220px; color: var(--muted); }
+    .progression-table td:nth-child(3) { min-width: 130px; }
+    .progression-table td:nth-child(4) { min-width: 160px; color: var(--muted); }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 0.74rem;
+      font-weight: 850;
+      white-space: nowrap;
+    }
+
+    .status-pill.candidate { color: var(--green); background: var(--green-soft); }
+    .status-pill.hold { color: var(--blue); background: var(--blue-soft); }
+    .status-pill.adjust { color: #b84d20; background: #fff0e8; }
+    .status-pill.missing { color: #685e4b; background: #f3efe7; }
+    .progression-feedback { margin-top: 14px; }
+
+    .body-trend-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .trend-card {
+      min-width: 0;
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: var(--paper);
+    }
+
+    .trend-card-head {
+      display: flex;
+      align-items: start;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .trend-card h3 { margin: 0; }
+    .trend-change { color: var(--green); font-weight: 900; white-space: nowrap; }
+    .trend-change.down { color: var(--blue); }
+
+    .trend-chart {
+      width: 100%;
+      height: 110px;
+      margin-top: 14px;
+      overflow: visible;
+    }
+
+    .trend-chart .grid-line { stroke: #dce6e2; stroke-width: 1; }
+    .trend-chart .data-line { fill: none; stroke: var(--green); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    .trend-chart .data-point { fill: #fff; stroke: var(--green); stroke-width: 3; }
+    .trend-meta { margin-top: 8px; color: var(--muted); font-size: 0.8rem; }
+
     .muscle-map-card {
       display: grid;
       grid-template-columns: minmax(0, 1.65fr) minmax(260px, 0.7fr);
@@ -968,6 +1068,26 @@
 
     .record time { font-weight: 800; }
 
+    .record-meta { min-width: 0; }
+
+    .quality-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 9px;
+    }
+
+    .quality-badge {
+      padding: 5px 8px;
+      border-radius: 999px;
+      background: #f3efe7;
+      color: #685e4b;
+      font-size: 0.7rem;
+      font-weight: 800;
+    }
+
+    .quality-badge.complete { color: var(--green); background: var(--green-soft); }
+
     .record h4 {
       margin: 0 0 6px;
       font-size: 0.9rem;
@@ -1235,7 +1355,8 @@
       }
       .app-tab { padding: 11px 6px; font-size: 0.84rem; }
       section { margin-top: 42px; }
-      .stats, .grid, .coach-grid, .session-summary, .muscle-map-card, .routine-grid, .composition-grid, .nutrient-grid { grid-template-columns: 1fr; }
+      .stats, .grid, .coach-grid, .session-summary, .weekly-decision-grid, .muscle-map-card, .routine-grid, .composition-grid, .body-trend-grid, .nutrient-grid { grid-template-columns: 1fr; }
+      .metrics.weekly-metrics { grid-template-columns: 1fr; }
       .metrics { grid-template-columns: repeat(2, 1fr); }
       .metric, .stat, .card, .feedback-card, .action-card, .composition-card, .muscle-map-info, .exercise-map-guide { min-width: 0; }
       .metric strong, .exercise-filter strong, .exercise-filter small, .composition-detail, .record, .archive-content { overflow-wrap: anywhere; }
@@ -1319,6 +1440,7 @@
       .workout-history-table .exercise-cell,
       .workout-history-table .detail-cell,
       .workout-history-table .muscle-cell { min-width: 0; }
+      .progression-table td { min-width: 0; }
     }
 
     @media (max-width: 420px) {
@@ -1385,7 +1507,30 @@
       </div>
     </section>
 
-    <section data-dashboard-panel="home" data-dashboard-order="3" aria-labelledby="status-title">
+    <section data-dashboard-panel="home" data-dashboard-order="3" aria-labelledby="weekly-coaching-title">
+      <div class="section-head">
+        <div>
+          <h2 id="weekly-coaching-title">최근 7일 코칭 요약</h2>
+          <p class="muted">운동량·자극 분포·영양·기록 완성도를 묶어 다음 결정을 정한다.</p>
+        </div>
+        <span class="tag blue" id="weekly-coaching-range">기록 대기 중</span>
+      </div>
+      <div class="metrics weekly-metrics" id="weekly-coaching-metrics"></div>
+      <div class="weekly-decision-grid">
+        <article class="weekly-card">
+          <span class="tag">Training load</span>
+          <h3>누적 자극과 회복</h3>
+          <div id="weekly-training-insight" class="insight-stack"></div>
+        </article>
+        <article class="weekly-card">
+          <span class="tag blue">Data quality</span>
+          <h3>다음 판단에 필요한 기록</h3>
+          <div id="weekly-data-quality" class="insight-stack"></div>
+        </article>
+      </div>
+    </section>
+
+    <section data-dashboard-panel="home" data-dashboard-order="4" aria-labelledby="status-title">
       <div class="section-head">
         <div>
           <h2 id="status-title">최근 기록 한눈에 보기</h2>
@@ -1429,7 +1574,7 @@
       </details>
     </section>
 
-    <section data-dashboard-panel="workout" data-dashboard-order="3" aria-labelledby="muscle-map-title">
+    <section data-dashboard-panel="workout" data-dashboard-order="4" aria-labelledby="muscle-map-title">
       <div class="section-head">
         <div>
           <h2 id="muscle-map-title">최근 운동 자극 지도</h2>
@@ -1498,7 +1643,7 @@
       </div>
     </section>
 
-    <section data-dashboard-panel="workout" data-dashboard-order="2" aria-labelledby="routine-policy-title">
+    <section data-dashboard-panel="workout" data-dashboard-order="3" aria-labelledby="routine-policy-title">
       <div class="section-head">
         <div>
           <h2 id="routine-policy-title">고정 상체 루틴 운영 원칙</h2>
@@ -1534,6 +1679,31 @@
       <div class="progression-rule" id="progression-rule"></div>
     </section>
 
+    <section data-dashboard-panel="workout" data-dashboard-order="2" aria-labelledby="progression-title">
+      <div class="section-head">
+        <div>
+          <h2 id="progression-title">운동별 증량 판정</h2>
+          <p class="muted">최근 수행과 RIR·자세 기록을 증량 규칙에 대입한다.</p>
+        </div>
+        <span class="tag blue" id="progression-summary">판정 대기 중</span>
+      </div>
+      <div class="table-wrap decision-table-wrap">
+        <table class="progression-table">
+          <thead>
+            <tr>
+              <th scope="col">운동</th>
+              <th scope="col">최근 수행</th>
+              <th scope="col">최근 2회</th>
+              <th scope="col">수행 품질</th>
+              <th scope="col">현재 판정</th>
+            </tr>
+          </thead>
+          <tbody id="progression-table-body"></tbody>
+        </table>
+      </div>
+      <div class="callout progression-feedback" id="progression-feedback"></div>
+    </section>
+
     <section data-dashboard-panel="workout" data-dashboard-order="1" aria-labelledby="calendar-section-title">
       <div class="section-head">
         <div>
@@ -1558,7 +1728,21 @@
       </div>
     </section>
 
-    <section data-dashboard-panel="body" data-dashboard-order="2" aria-labelledby="body-history-title">
+    <section data-dashboard-panel="body" data-dashboard-order="2" aria-labelledby="body-trend-title">
+      <div class="section-head">
+        <div>
+          <h2 id="body-trend-title">체성분 추세</h2>
+          <p class="muted">첫 측정 대비 변화를 보되, 충분한 기록이 쌓이기 전에는 방향을 단정하지 않는다.</p>
+        </div>
+        <span class="tag blue" id="body-trend-status">측정 대기 중</span>
+      </div>
+      <div class="body-trend-grid" id="body-trend-grid">
+        <div class="empty">체성분 기록이 쌓이면 지표별 변화선을 표시합니다.</div>
+      </div>
+      <p class="composition-note" id="body-trend-note"></p>
+    </section>
+
+    <section data-dashboard-panel="body" data-dashboard-order="3" aria-labelledby="body-history-title">
       <div class="section-head">
         <div>
           <h2 id="body-history-title">체성분 누적 변화</h2>
@@ -1603,7 +1787,19 @@
       <div class="callout nutrition-focus" id="nutrition-focus">식사 기록이 들어오면 목표 대비 가장 중요한 보완점을 표시합니다.</div>
     </section>
 
-    <section data-dashboard-panel="nutrition" data-dashboard-order="2" aria-labelledby="nutrient-balance-title">
+    <section data-dashboard-panel="nutrition" data-dashboard-order="2" aria-labelledby="nutrition-weekly-title">
+      <div class="section-head">
+        <div>
+          <h2 id="nutrition-weekly-title">최근 7일 식사 패턴</h2>
+          <p class="muted">하루의 추정치보다 반복되는 단백질 부족·유리당·나트륨 패턴을 먼저 본다.</p>
+        </div>
+        <span class="tag blue" id="nutrition-weekly-range">기록 대기 중</span>
+      </div>
+      <div class="metrics weekly-metrics" id="nutrition-weekly-metrics"></div>
+      <div class="callout nutrition-focus" id="nutrition-weekly-feedback"></div>
+    </section>
+
+    <section data-dashboard-panel="nutrition" data-dashboard-order="3" aria-labelledby="nutrient-balance-title">
       <div class="section-head">
         <div>
           <h2 id="nutrient-balance-title">하루 영양 충족도</h2>
@@ -1623,7 +1819,7 @@
       </details>
     </section>
 
-    <section data-dashboard-panel="workout" data-dashboard-order="4" aria-labelledby="workout-archive-title">
+    <section data-dashboard-panel="workout" data-dashboard-order="5" aria-labelledby="workout-archive-title">
       <div class="section-head">
         <div>
           <h2 id="workout-archive-title">운동 수행 기록</h2>
@@ -1635,7 +1831,7 @@
       </div>
     </section>
 
-    <section data-dashboard-panel="nutrition" data-dashboard-order="3" aria-labelledby="nutrition-archive-title">
+    <section data-dashboard-panel="nutrition" data-dashboard-order="4" aria-labelledby="nutrition-archive-title">
       <div class="section-head">
         <div>
           <h2 id="nutrition-archive-title">날짜별 식사 기록</h2>
@@ -1659,7 +1855,7 @@
       </div>
     </section>
 
-    <section data-dashboard-panel="workout" data-dashboard-order="5" aria-labelledby="rules-title">
+    <section data-dashboard-panel="workout" data-dashboard-order="6" aria-labelledby="rules-title">
       <details class="archive">
         <summary id="rules-title">기록을 해석하는 원칙</summary>
         <div class="archive-content">
