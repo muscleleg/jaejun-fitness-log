@@ -1,6 +1,87 @@
 // 새 기록은 날짜별 객체로 이 배열에 추가한다. 같은 날짜의 후속 정보는 기존 객체에 병합한다.
 window.healthRecordData = [
   {
+    date: "2026-08-21",
+    workouts: [
+      {
+        exerciseId: "cable-one-arm-lateral-raise",
+        sets: 5,
+        reps: 10,
+        detail: "한 팔당 5kg · 양쪽 각 5세트 × 10회"
+      },
+      {
+        exerciseId: "seated-row",
+        sets: 5,
+        reps: 10,
+        detail: "30kg · 5세트 × 10회"
+      },
+      {
+        exerciseId: "cable-overhead-triceps-extension",
+        sets: 5,
+        reps: 10,
+        detail: "25kg 4세트 × 10회 + 30kg 1세트 × 10회",
+        formStatus: "30kg 1세트 시험 수행"
+      },
+      {
+        exerciseId: "assisted-pull-up-machine",
+        sets: 4,
+        repsBySet: [10, 10, 10, 5],
+        detail: "표시 중량 35kg · 세트별 10·10·10·5회 후 중단 · 보조 중량 여부 미확인",
+        formStatus: "4세트째 5회 후 중단"
+      },
+      {
+        exerciseId: "reverse-pec-deck-fly",
+        sets: 5,
+        repsBySet: [10, 10, 5, 5, 5],
+        detail: "20kg · 2세트 × 10회 + 3세트 × 5회",
+        formStatus: "3세트째부터 목표 반복 수 미달"
+      },
+      {
+        exerciseId: "machine-shoulder-press",
+        sets: 5,
+        reps: 10,
+        detail: "15kg · 5세트 × 10회"
+      },
+      {
+        exerciseId: "machine-chest-press",
+        sets: 5,
+        reps: 10,
+        detail: "30kg · 5세트 × 10회"
+      }
+    ],
+    condition: "상체 운동 실시 · 총 34세트 · 음식·체성분 미기록",
+    advice: {
+      title: "풀업은 유지, 리버스 펙덱과 삼두는 아직 전체 증량 단계가 아니다",
+      points: [
+        {
+          label: "운동량",
+          text: "기존에 쓰던 7종목으로 상체 34세트를 수행했다. 어깨·등·가슴·삼두를 고르게 다뤘고, 새 종목을 추가할 필요는 없다."
+        },
+        {
+          label: "어시스트 풀업",
+          text: "19일과 같은 10·10·10·5회다. 앞 3세트는 안정적이지만 마지막 세트가 5회에서 멈췄으므로 표시 중량 35kg을 유지한다. 보조 중량 기구라면 도움을 조금 늘리고, 실제 저항 표시면 중량을 낮춰 4세트의 반복 급락을 줄인다."
+        },
+        {
+          label: "삼두",
+          text: "25kg 4세트 뒤 30kg 1세트 10회 성공은 좋은 시험 기록이다. 다만 한 세트만으로 전체 증량 조건은 충족하지 않았다. 다음에는 25kg 5세트를 안정적으로 끝내거나, 자세와 여유 반복 수를 기록하며 30kg 시험 세트만 유지한다."
+        },
+        {
+          label: "후면 어깨",
+          text: "리버스 펙덱 20kg은 2세트만 10회를 채우고 이후 5회로 떨어졌다. 다음에는 20kg 2세트 × 10회 후 15kg으로 3세트 × 10회를 채우거나, 15kg에서 5세트 × 10회로 회복한다. 20kg 전체 5세트 증량은 아직 이르다."
+        },
+        {
+          label: "프레스",
+          text: "머신 숄더프레스 15kg과 체스트프레스 30kg은 각각 5세트 × 10회를 완료했다. 마지막 세트에도 2회 이상 더 할 여유가 있었는지와 자세를 다음 운동에 남겨야 두 운동일 연속 기준으로 증량을 판단할 수 있다."
+        }
+      ]
+    },
+    actions: [
+      "다음 풀업은 같은 설정에서 4세트 모두 10회를 우선 목표로 한다.",
+      "리버스 펙덱은 실패 반복을 누적하지 말고 15kg 백오프 세트로 10회를 확보한다.",
+      "프레스와 삼두의 마지막 세트 여유 반복 수(RIR)와 어깨 통증 유무를 기록한다."
+    ]
+  },
+  {
     date: "2026-08-20",
     workouts: [],
     meals: [
